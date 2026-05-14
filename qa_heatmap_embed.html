@@ -6,12 +6,51 @@
   <title>QA 결함 히트맵</title>
   <style>
     * { box-sizing: border-box; }
+    :root {
+      color-scheme: light dark;
+      --text: #20242c;
+      --muted: #78716c;
+      --muted-2: #8f8881;
+      --line: #e7e2dc;
+      --tab-line: #cfd6e3;
+      --surface-total: linear-gradient(135deg, rgba(239, 246, 255, .96), rgba(255, 255, 255, .74));
+      --surface-open: linear-gradient(135deg, rgba(254, 242, 242, .96), rgba(255, 255, 255, .74));
+      --surface-future: linear-gradient(135deg, rgba(255, 251, 235, .96), rgba(255, 255, 255, .74));
+      --surface-risk-low: linear-gradient(135deg, rgba(240, 253, 244, .96), rgba(255, 255, 255, .74));
+      --surface-risk-medium: linear-gradient(135deg, rgba(255, 251, 235, .96), rgba(255, 255, 255, .74));
+      --surface-risk-high: linear-gradient(135deg, rgba(254, 242, 242, .96), rgba(255, 255, 255, .74));
+      --surface-panel: linear-gradient(135deg, rgba(255, 255, 255, .8), rgba(248, 250, 252, .66));
+      --tab-bg: #fff;
+      --tab-active: linear-gradient(135deg, #1f2937, #111827);
+      --tab-active-text: #fff;
+      --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, .65);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text: #f4f4f5;
+        --muted: #b8afa6;
+        --muted-2: #a8a29e;
+        --line: rgba(255, 255, 255, .13);
+        --tab-line: rgba(255, 255, 255, .16);
+        --surface-total: linear-gradient(135deg, rgba(30, 64, 175, .58), rgba(24, 24, 27, .72));
+        --surface-open: linear-gradient(135deg, rgba(153, 27, 27, .62), rgba(24, 24, 27, .72));
+        --surface-future: linear-gradient(135deg, rgba(146, 64, 14, .62), rgba(24, 24, 27, .72));
+        --surface-risk-low: linear-gradient(135deg, rgba(22, 101, 52, .58), rgba(24, 24, 27, .72));
+        --surface-risk-medium: linear-gradient(135deg, rgba(146, 64, 14, .62), rgba(24, 24, 27, .72));
+        --surface-risk-high: linear-gradient(135deg, rgba(153, 27, 27, .62), rgba(24, 24, 27, .72));
+        --surface-panel: linear-gradient(135deg, rgba(39, 39, 42, .78), rgba(24, 24, 27, .68));
+        --tab-bg: rgba(39, 39, 42, .86);
+        --tab-active: linear-gradient(135deg, #e5e7eb, #a1a1aa);
+        --tab-active-text: #18181b;
+        --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, .08);
+      }
+    }
     body {
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: transparent;
-      color: #20242c;
+      color: var(--text);
     }
     .dashboard {
       width: 100%;
@@ -31,8 +70,8 @@
       margin-bottom: 12px;
     }
     .title { font-size: 18px; font-weight: 800; }
-    .subtitle { margin-top: 4px; color: #78716c; font-size: 12px; line-height: 1.35; }
-    .meta { text-align: right; font-size: 11px; color: #78716c; white-space: nowrap; }
+    .subtitle { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .meta { text-align: right; font-size: 11px; color: var(--muted); white-space: nowrap; }
     .summary {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -40,14 +79,14 @@
       margin-bottom: 10px;
     }
     .card {
-      background: rgba(255, 255, 255, .72);
-      border: 1px solid #e7e2dc;
+      background: var(--surface-panel);
+      border: 1px solid var(--line);
       border-radius: 8px;
       padding: 12px 14px;
       min-width: 0;
       position: relative;
       overflow: hidden;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .65);
+      box-shadow: var(--shadow-inset);
     }
     .card::before {
       content: "";
@@ -56,17 +95,17 @@
       width: 5px;
       background: var(--accent, #94a3b8);
     }
-    .card.total { --accent: #2563eb; background: linear-gradient(135deg, rgba(239, 246, 255, .96), rgba(255, 255, 255, .74)); }
-    .card.open { --accent: #dc2626; background: linear-gradient(135deg, rgba(254, 242, 242, .96), rgba(255, 255, 255, .74)); }
-    .card.future { --accent: #d97706; background: linear-gradient(135deg, rgba(255, 251, 235, .96), rgba(255, 255, 255, .74)); }
-    .card.risk { --accent: #16a34a; background: linear-gradient(135deg, rgba(240, 253, 244, .96), rgba(255, 255, 255, .74)); }
-    .card.risk.medium { --accent: #d97706; background: linear-gradient(135deg, rgba(255, 251, 235, .96), rgba(255, 255, 255, .74)); }
-    .card.risk.high { --accent: #dc2626; background: linear-gradient(135deg, rgba(254, 242, 242, .96), rgba(255, 255, 255, .74)); }
-    .card-label { color: #78716c; font-size: 12px; margin-bottom: 6px; padding-left: 2px; }
-    .card-value { color: var(--accent, #20242c); font-size: 24px; font-weight: 800; line-height: 1.05; }
+    .card.total { --accent: #2563eb; background: var(--surface-total); }
+    .card.open { --accent: #dc2626; background: var(--surface-open); }
+    .card.future { --accent: #d97706; background: var(--surface-future); }
+    .card.risk { --accent: #16a34a; background: var(--surface-risk-low); }
+    .card.risk.medium { --accent: #d97706; background: var(--surface-risk-medium); }
+    .card.risk.high { --accent: #dc2626; background: var(--surface-risk-high); }
+    .card-label { color: var(--muted); font-size: 12px; margin-bottom: 6px; padding-left: 2px; }
+    .card-value { color: var(--accent, var(--text)); font-size: 24px; font-weight: 800; line-height: 1.05; }
     .card-note {
       margin-top: 5px;
-      color: #8f8881;
+      color: var(--muted-2);
       font-size: 11px;
       line-height: 1.3;
       overflow: hidden;
@@ -74,8 +113,8 @@
       white-space: nowrap;
     }
     .panel {
-      background: linear-gradient(135deg, rgba(255, 255, 255, .8), rgba(248, 250, 252, .66));
-      border: 1px solid #e7e2dc;
+      background: var(--surface-panel);
+      border: 1px solid var(--line);
       border-radius: 8px;
       padding: 0;
       overflow: hidden;
@@ -84,7 +123,7 @@
       cursor: pointer;
       list-style: none;
       padding: 9px 12px;
-      color: #303846;
+      color: var(--text);
       font-size: 12px;
       font-weight: 700;
     }
@@ -102,13 +141,13 @@
     .panel > summary::after {
       content: "펼치기";
       float: right;
-      color: #78716c;
+      color: var(--muted);
       font-size: 11px;
       font-weight: 500;
     }
     .panel[open] > summary::after { content: "접기"; }
     .panel-body {
-      border-top: 1px solid #e7e2dc;
+      border-top: 1px solid var(--line);
       padding: 10px;
     }
     .toolbar {
@@ -121,16 +160,16 @@
     }
     .tabs { display: flex; flex-wrap: wrap; gap: 7px; }
     .tab {
-      border: 1px solid #cfd6e3;
-      background: #fff;
-      color: #303846;
+      border: 1px solid var(--tab-line);
+      background: var(--tab-bg);
+      color: var(--text);
       padding: 6px 9px;
       border-radius: 7px;
       font-size: 11px;
       cursor: pointer;
     }
-    .tab.active { background: linear-gradient(135deg, #1f2937, #111827); color: #fff; border-color: #111827; }
-    .legend { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #78716c; white-space: nowrap; }
+    .tab.active { background: var(--tab-active); color: var(--tab-active-text); border-color: transparent; }
+    .legend { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); white-space: nowrap; }
     .legend-box { width: 18px; height: 10px; border-radius: 3px; }
     .heatmap {
       display: grid;
@@ -173,14 +212,14 @@
       flex-direction: column;
       gap: 4px;
       margin-top: 9px;
-      color: #687182;
+      color: var(--muted);
       font-size: 10px;
     }
     .empty {
       padding: 48px 12px;
-      color: #78716c;
+      color: var(--muted);
       text-align: center;
-      border: 1px dashed #cfd6e3;
+      border: 1px dashed var(--tab-line);
       border-radius: 8px;
       grid-column: 1 / -1;
     }
@@ -253,8 +292,47 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-13 16:57:31",
+  "generatedAt": "2026-05-14 11:30:15",
   "rows": [
+    {
+      "id": "ISSUE-786",
+      "title": "[관광객카드][공통] ‘유심 선택’ 화면 내 음성+데이터 SIM 초과 시 노출 토스트 팝업 문구 기획서와 상이",
+      "area": "관광객카드",
+      "defectType": "UX/UI",
+      "targetVersion": "[G.H]v1.0.0",
+      "domain": "방한 고한패스",
+      "severity": "Minor",
+      "status": "등록 (Registered)",
+      "priority": "보통",
+      "createdAt": "2026-05-14T02:19:00.000Z",
+      "url": "https://www.notion.so/SIM-36073fbd195180a49c53e95a3cc70246"
+    },
+    {
+      "id": "ISSUE-785",
+      "title": "[관광객카드][공통]유심선택 페이지 ‘요금제 선택’ BS 스크롤 미작동",
+      "area": "관광객카드",
+      "defectType": "기능",
+      "targetVersion": "[G.H]v1.0.0",
+      "domain": "방한 고한패스",
+      "severity": "Minor",
+      "status": "결함 아님 (Not an issue)",
+      "priority": "보통",
+      "createdAt": "2026-05-14T02:12:00.000Z",
+      "url": "https://www.notion.so/BS-36073fbd19518022b381fc7c546bee8e"
+    },
+    {
+      "id": "ISSUE-784",
+      "title": "[관광객카드][공통] ‘수령처 선택’ 화면 내 KT 결제 영역이 상단에 노출되는 현상",
+      "area": "관광객카드",
+      "defectType": "기능",
+      "targetVersion": "[G.H]v1.0.0",
+      "domain": "방한 고한패스",
+      "severity": "Minor",
+      "status": "개발 완료 (Dev Done)",
+      "priority": "보통",
+      "createdAt": "2026-05-14T01:16:00.000Z",
+      "url": "https://www.notion.so/KT-36073fbd195180a5ba24f86c925f260b"
+    },
     {
       "id": "ISSUE-782",
       "title": "[마이탭][저장한 장소] 저장한 장소 50개 넘었을 시 팝업 문구 기획서와 상이",
@@ -1095,7 +1173,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "개발 완료 (Dev Done)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:18:00.000Z",
       "url": "https://www.notion.so/35e73fbd1951809ba7e7c9c322051263"
@@ -1108,7 +1186,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "개발 완료 (Dev Done)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:16:00.000Z",
       "url": "https://www.notion.so/35e73fbd195180a2a5b5d3fba94bc721"
@@ -1121,7 +1199,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "등록 (Registered)",
+      "status": "처리중 (In Progress)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:15:00.000Z",
       "url": "https://www.notion.so/tab-35e73fbd1951809ab832c62764ad963b"
@@ -1167,13 +1245,13 @@
     },
     {
       "id": "ISSUE-667",
-      "title": "[통합길찾기] '길찾기 목록' 화면 내 검색 취소 'x' 버튼 클릭 시  '내 주변 관광지' 로 이동하는 현상",
+      "title": "[통합길찾기] '길찾기 목록' 화면 내 검색 취소 'x' 버튼 클릭 시  '내 주변 관광지' 로 이동하는",
       "area": "통합길찾기",
       "defectType": "기능",
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "등록 (Registered)",
+      "status": "개발 완료 (Dev Done)",
       "priority": "보통",
       "createdAt": "2026-05-12T00:50:00.000Z",
       "url": "https://www.notion.so/x-35e73fbd1951805d9131d6edb30201ba"
@@ -4430,13 +4508,13 @@
     }
   ],
   "summary": {
-    "total": 321,
+    "total": 324,
     "open": 75,
     "futureFix": 12,
     "majorPlus": 86,
     "critical": 20,
     "domains": {
-      "방한 고한패스": 71,
+      "방한 고한패스": 74,
       "한패스": 250
     }
   }
