@@ -266,9 +266,30 @@
       grid-template-columns: repeat(3, minmax(0, 1fr));
       grid-auto-rows: 104px;
       gap: 6px;
+      grid-auto-flow: dense;
     }
     .chart {
       min-height: 360px;
+    }
+    .version-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .version-tab {
+      border: 1px solid var(--tab-line);
+      background: var(--tab-bg);
+      color: var(--text);
+      padding: 6px 9px;
+      border-radius: 7px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .version-tab.active {
+      background: var(--tab-active);
+      color: var(--tab-active-text);
+      border-color: transparent;
     }
     .chart-head {
       display: flex;
@@ -284,7 +305,47 @@
     .chart-count { fill: currentColor; color: var(--text); font-size: 10px; font-weight: 700; }
     .trend-line { fill: none; stroke: #2563eb; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
     .trend-dot { fill: #dc2626; stroke: rgba(255, 255, 255, .7); stroke-width: 2; }
+    .trend-dot.selected { fill: #fbbf24; stroke: #dc2626; stroke-width: 3; }
     .trend-bar { fill: rgba(37, 99, 235, .22); }
+    .trend-bar.selected { fill: rgba(220, 38, 38, .28); }
+    .distribution {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .dist-block {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: rgba(255, 255, 255, .28);
+    }
+    .dist-title {
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .dist-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 46px 42px;
+      gap: 8px;
+      align-items: center;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .dist-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .dist-count, .dist-rate {
+      color: var(--text);
+      text-align: right;
+      font-weight: 700;
+    }
     .tile {
       position: relative;
       border: 0;
@@ -302,7 +363,8 @@
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18);
     }
     .tile:hover { filter: brightness(0.96); }
-    .tile.large, .tile.medium { grid-column: span 1; grid-row: span 1; }
+    .tile.large { grid-column: span 2; grid-row: span 2; }
+    .tile.medium { grid-row: span 2; }
     .area { font-weight: 800; font-size: 13px; line-height: 1.2; word-break: keep-all; }
     .count { margin-top: 5px; font-size: 16px; font-weight: 800; }
     .detail { margin-top: 5px; font-size: 10px; opacity: .9; }
@@ -341,6 +403,8 @@
       .toolbar { align-items: flex-start; flex-direction: column; }
       .detail-grid { grid-template-columns: 1fr; }
       .heatmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tile.large, .tile.medium { grid-column: span 1; grid-row: span 1; }
+      .distribution { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -420,7 +484,7 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-15 09:53:32",
+  "generatedAt": "2026-05-15 10:29:36",
   "rows": [
     {
       "id": "ISSUE-803",
@@ -4875,6 +4939,7 @@
       { key: "major", label: "Major+" }
     ];
     let activeFilter = "all";
+    let selectedVersion = "";
 
     function isDone(row) {
       return row.status.includes("완료") ||
@@ -4913,8 +4978,8 @@
     }
 
     function sizeByRank(index, count, maxCount) {
-      if (index < 2 && count === maxCount && maxCount > 2) return "large";
-      if (index < 4 && count >= 3) return "medium";
+      if (index === 0 && maxCount >= 4) return "large";
+      if (index < 4 && count >= Math.max(3, Math.ceil(maxCount * .45))) return "medium";
       return "";
     }
 
@@ -5070,18 +5135,46 @@
       return String(a).localeCompare(String(b), "ko");
     }
 
+    function countBy(rows, key) {
+      return rows.reduce((acc, row) => {
+        const value = row[key] || "미지정";
+        acc[value] = (acc[value] || 0) + 1;
+        return acc;
+      }, {});
+    }
+
+    function renderDistributionBlock(title, counter, total) {
+      const entries = Object.entries(counter).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "ko"));
+      if (!entries.length) {
+        return `<div class="dist-block"><div class="dist-title">${title}</div><div class="dist-row"><span class="dist-name">데이터 없음</span><span class="dist-count">0건</span><span class="dist-rate">0%</span></div></div>`;
+      }
+      return `
+        <div class="dist-block">
+          <div class="dist-title">${title}</div>
+          ${entries.map(([name, count]) => `
+            <div class="dist-row">
+              <span class="dist-name" title="${name}">${name}</span>
+              <span class="dist-count">${count}건</span>
+              <span class="dist-rate">${total ? Math.round((count / total) * 100) : 0}%</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
     function renderVersionChart(rows) {
       const chart = document.getElementById("versionChart");
       const versionMap = new Map();
       rows.forEach(row => {
         const version = row.targetVersion || "미지정";
         if (!versionMap.has(version)) {
-          versionMap.set(version, { version, total: 0, open: 0, majorPlus: 0 });
+          versionMap.set(version, { version, total: 0, open: 0, majorPlus: 0, rows: [] });
         }
         const item = versionMap.get(version);
         item.total += 1;
         if (!isDone(row) && !isFutureFix(row)) item.open += 1;
         if (isMajorPlus(row)) item.majorPlus += 1;
+        item.rows.push(row);
       });
 
       const items = Array.from(versionMap.values()).sort((a, b) => compareVersions(a.version, b.version));
@@ -5089,6 +5182,11 @@
         chart.innerHTML = '<div class="empty">표시할 버전 데이터가 없습니다.</div>';
         return;
       }
+
+      if (!selectedVersion || !versionMap.has(selectedVersion)) {
+        selectedVersion = items[items.length - 1].version;
+      }
+      const selected = versionMap.get(selectedVersion);
 
       const width = 960;
       const height = 250;
@@ -5105,21 +5203,39 @@
       });
       const path = points.map(point => `${point.x},${point.y}`).join(" ");
 
-      document.getElementById("chartMeta").textContent = `총 ${rows.length}건 / 버전 ${items.length}개`;
+      document.getElementById("chartMeta").textContent = `선택 ${selectedVersion} / ${selected.total}건`;
       chart.innerHTML = `
+        <div class="version-buttons">
+          ${items.map(item => `
+            <button class="version-tab ${item.version === selectedVersion ? "active" : ""}" type="button" data-version="${item.version}">
+              ${item.version} · ${item.total}
+            </button>
+          `).join("")}
+        </div>
         <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="타겟 버전별 결함 추이 그래프">
           <line x1="${padX}" y1="${height - padY}" x2="${width - padX}" y2="${height - padY}" stroke="currentColor" opacity=".18" />
           ${points.map(point => `
-            <rect class="trend-bar" x="${point.x - 14}" y="${point.y}" width="28" height="${height - padY - point.y}" rx="5"></rect>
+            <rect class="trend-bar ${point.version === selectedVersion ? "selected" : ""}" x="${point.x - 14}" y="${point.y}" width="28" height="${height - padY - point.y}" rx="5"></rect>
           `).join("")}
           <polyline class="trend-line" points="${path}"></polyline>
           ${points.map((point, index) => `
-            <circle class="trend-dot" cx="${point.x}" cy="${point.y}" r="5"></circle>
+            <circle class="trend-dot ${point.version === selectedVersion ? "selected" : ""}" cx="${point.x}" cy="${point.y}" r="5"></circle>
             <text class="chart-count" x="${point.x}" y="${point.y - 10}" text-anchor="middle">${point.total}</text>
             <text class="axis-label" x="${point.x}" y="${height - 8}" text-anchor="middle">${point.version}</text>
           `).join("")}
         </svg>
+        <div class="distribution">
+          ${renderDistributionBlock("심각도 분포", countBy(selected.rows, "severity"), selected.total)}
+          ${renderDistributionBlock("결함유형 분포", countBy(selected.rows, "defectType"), selected.total)}
+        </div>
       `;
+
+      chart.querySelectorAll(".version-tab").forEach(button => {
+        button.addEventListener("click", () => {
+          selectedVersion = button.dataset.version;
+          renderVersionChart(rows);
+        });
+      });
     }
 
     function renderHeatmap(groups) {
