@@ -298,14 +298,93 @@
       color: var(--text);
       font-size: 13px;
     }
+    .heatmap-widget {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, .18);
+    }
+    .heatmap-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 42px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, .36);
+    }
+    .heatmap-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .hm-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      padding: 5px 8px;
+      border: 1px solid var(--tab-line);
+      border-radius: 6px;
+      background: var(--tab-bg);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .hm-control .swatch {
+      display: inline-grid;
+      grid-template-columns: repeat(2, 5px);
+      grid-template-rows: repeat(2, 5px);
+      gap: 2px;
+    }
+    .hm-control .swatch i {
+      display: block;
+      width: 5px;
+      height: 5px;
+      border-radius: 1px;
+    }
+    .hm-control .swatch i:nth-child(1) { background: #38bdf8; }
+    .hm-control .swatch i:nth-child(2) { background: #22c55e; }
+    .hm-control .swatch i:nth-child(3) { background: #fbbf24; }
+    .hm-control .swatch i:nth-child(4) { background: #dc2626; }
+    .heatmap-actions {
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
     .heatmap {
       position: relative;
       height: 560px;
       min-height: 420px;
       overflow: hidden;
-      border-radius: 8px;
+      border-radius: 0;
       background: rgba(120, 113, 108, .08);
     }
+    .heatmap-scale {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .scale-bar {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(28px, 1fr));
+      width: min(360px, 60%);
+      height: 8px;
+      overflow: hidden;
+      border-radius: 99px;
+    }
+    .scale-bar span:nth-child(1) { background: #38bdf8; }
+    .scale-bar span:nth-child(2) { background: #2563eb; }
+    .scale-bar span:nth-child(3) { background: #fbbf24; }
+    .scale-bar span:nth-child(4) { background: #ef4444; }
+    .scale-bar span:nth-child(5) { background: #7f1d1d; }
     .chart {
       min-height: 480px;
     }
@@ -540,23 +619,32 @@
       <div class="panel-body">
         <div class="toolbar">
           <div class="tabs" id="tabs"></div>
-          <div class="legend" id="legend">
-              낮음
-              <span class="legend-box blue"></span>
-              <span class="legend-box orange"></span>
-              <span class="legend-box red1"></span>
-              <span class="legend-box red2"></span>
-              <span class="legend-box red3"></span>
-              높음
-          </div>
         </div>
         <div class="detail-grid">
           <section class="detail-card">
             <div class="detail-head">
               <strong>결함 히트맵</strong>
-              <span>영역별 결함 밀도</span>
+              <span>영역별 결함 밀도 / 클릭 시 Notion 이동</span>
             </div>
-            <div class="heatmap" id="heatmap"></div>
+            <div class="heatmap-widget">
+              <div class="heatmap-topbar">
+                <div class="heatmap-controls">
+                  <span class="hm-control">영역</span>
+                  <span class="hm-control">크기 결함 수</span>
+                  <span class="hm-control">
+                    <span class="swatch"><i></i><i></i><i></i><i></i></span>
+                    색상 위험도
+                  </span>
+                </div>
+                <div class="heatmap-actions">Treemap</div>
+              </div>
+              <div class="heatmap" id="heatmap"></div>
+              <div class="heatmap-scale">
+                낮음
+                <span class="scale-bar"><span></span><span></span><span></span><span></span><span></span></span>
+                높음
+              </div>
+            </div>
           </section>
           <section class="detail-card">
             <div class="detail-head">
@@ -576,7 +664,7 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-15 11:51:38",
+  "generatedAt": "2026-05-15 12:57:57",
   "rows": [
     {
       "id": "ISSUE-807",
