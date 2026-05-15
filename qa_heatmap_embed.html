@@ -45,15 +45,20 @@
         --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, .08);
       }
     }
+    html, body {
+      height: 100%;
+    }
     body {
       margin: 0;
       padding: 10px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: transparent;
       color: var(--text);
+      overflow: hidden;
     }
     .dashboard {
       width: 100%;
+      height: calc(100vh - 20px);
       max-width: none;
       min-width: 960px;
       margin: 0 auto;
@@ -61,6 +66,12 @@
       border: 0;
       border-radius: 0;
       padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .fixed-zone {
+      flex: 0 0 auto;
     }
     .header {
       display: flex;
@@ -182,6 +193,10 @@
       border-radius: 8px;
       padding: 0;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
     }
     .panel-title {
       padding: 9px 12px;
@@ -202,6 +217,21 @@
     .panel-body {
       border-top: 1px solid var(--line);
       padding: 10px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+    .detail-fixed {
+      flex: 0 0 auto;
+    }
+    .detail-scroll {
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-right: 4px;
     }
     .toolbar {
       display: flex;
@@ -230,20 +260,15 @@
       gap: 10px;
       align-items: start;
       min-height: 720px;
-      max-height: 760px;
-      overflow-x: hidden;
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      padding-right: 4px;
     }
-    .detail-grid::-webkit-scrollbar {
+    .detail-scroll::-webkit-scrollbar {
       width: 10px;
     }
-    .detail-grid::-webkit-scrollbar-track {
+    .detail-scroll::-webkit-scrollbar-track {
       background: rgba(120, 113, 108, .12);
       border-radius: 99px;
     }
-    .detail-grid::-webkit-scrollbar-thumb {
+    .detail-scroll::-webkit-scrollbar-thumb {
       background: rgba(120, 113, 108, .42);
       border-radius: 99px;
       border: 2px solid transparent;
@@ -553,78 +578,84 @@
 </head>
 <body>
   <div class="dashboard">
-    <div class="header">
-      <div>
-        <div class="title">QA 결함 히트맵</div>
-        <div class="subtitle">5.18.0 이후 / 목표버전 기준</div>
+    <div class="fixed-zone">
+      <div class="header">
+        <div>
+          <div class="title">QA 결함 히트맵</div>
+          <div class="subtitle">5.18.0 이후 / 목표버전 기준</div>
+        </div>
+        <div class="meta">마지막 생성<br /><strong id="updatedAt">-</strong></div>
       </div>
-      <div class="meta">마지막 생성<br /><strong id="updatedAt">-</strong></div>
-    </div>
 
-    <div class="summary">
-      <div class="card total">
-        <div class="card-label">전체 결함</div>
-        <div class="card-value" id="totalDefects">0</div>
-        <div class="card-note">Notion QA_ISSUES</div>
+      <div class="summary">
+        <div class="card total">
+          <div class="card-label">전체 결함</div>
+          <div class="card-value" id="totalDefects">0</div>
+          <div class="card-note">Notion QA_ISSUES</div>
+        </div>
+        <div class="card open">
+          <div class="card-label">미완료 결함</div>
+          <div class="card-value" id="openDefects">0</div>
+          <div class="card-note">Done/QA검증/결함아님/추후수정 제외</div>
+        </div>
+        <div class="card future">
+          <div class="card-label">추후 수정</div>
+          <div class="card-value" id="futureFix">0</div>
+          <div class="card-note">추후 수정 백로그 이관</div>
+        </div>
+        <div class="card risk" id="riskCard">
+          <div class="card-label">Release Risk</div>
+          <div class="card-value" id="riskLevel">-</div>
+          <div class="card-note" id="riskNote">-</div>
+        </div>
       </div>
-      <div class="card open">
-        <div class="card-label">미완료 결함</div>
-        <div class="card-value" id="openDefects">0</div>
-        <div class="card-note">Done/QA검증/결함아님/추후수정 제외</div>
-      </div>
-      <div class="card future">
-        <div class="card-label">추후 수정</div>
-        <div class="card-value" id="futureFix">0</div>
-        <div class="card-note">추후 수정 백로그 이관</div>
-      </div>
-      <div class="card risk" id="riskCard">
-        <div class="card-label">Release Risk</div>
-        <div class="card-value" id="riskLevel">-</div>
-        <div class="card-note" id="riskNote">-</div>
-      </div>
-    </div>
 
-    <div class="growth" id="growthFunnel"></div>
+      <div class="growth" id="growthFunnel"></div>
+    </div>
 
     <section class="panel">
       <div class="panel-title">결함 상세</div>
       <div class="panel-body">
-        <div class="toolbar">
-          <div class="tabs" id="tabs"></div>
+        <div class="detail-fixed">
+          <div class="toolbar">
+            <div class="tabs" id="tabs"></div>
+          </div>
         </div>
-        <div class="detail-grid">
-          <section class="detail-card">
-            <div class="detail-head">
-              <strong>결함 히트맵</strong>
-              <span>영역별 결함 밀도 / 클릭 시 Notion 이동</span>
-            </div>
-            <div class="heatmap-widget">
-              <div class="heatmap-topbar">
-                <div class="heatmap-controls">
-                  <span class="hm-control">영역</span>
-                  <span class="hm-control">크기 결함 수</span>
-                  <span class="hm-control">
-                    <span class="swatch"><i></i><i></i><i></i><i></i></span>
-                    색상 위험도
-                  </span>
+        <div class="detail-scroll">
+          <div class="detail-grid">
+            <section class="detail-card">
+              <div class="detail-head">
+                <strong>결함 히트맵</strong>
+                <span>영역별 결함 밀도 / 클릭 시 Notion 이동</span>
+              </div>
+              <div class="heatmap-widget">
+                <div class="heatmap-topbar">
+                  <div class="heatmap-controls">
+                    <span class="hm-control">영역</span>
+                    <span class="hm-control">크기 결함 수</span>
+                    <span class="hm-control">
+                      <span class="swatch"><i></i><i></i><i></i><i></i></span>
+                      색상 위험도
+                    </span>
+                  </div>
+                  <div class="heatmap-actions">Treemap</div>
                 </div>
-                <div class="heatmap-actions">Treemap</div>
+                <div class="heatmap" id="heatmap"></div>
+                <div class="heatmap-scale">
+                  낮음
+                  <span class="scale-bar"><span></span><span></span><span></span><span></span><span></span></span>
+                  높음
+                </div>
               </div>
-              <div class="heatmap" id="heatmap"></div>
-              <div class="heatmap-scale">
-                낮음
-                <span class="scale-bar"><span></span><span></span><span></span><span></span><span></span></span>
-                높음
+            </section>
+            <section class="detail-card">
+              <div class="detail-head">
+                <strong>타겟 버전별 결함 추이</strong>
+                <span id="chartMeta">-</span>
               </div>
-            </div>
-          </section>
-          <section class="detail-card">
-            <div class="detail-head">
-              <strong>타겟 버전별 결함 추이</strong>
-              <span id="chartMeta">-</span>
-            </div>
-            <div class="chart" id="versionChart"></div>
-          </section>
+              <div class="chart" id="versionChart"></div>
+            </section>
+          </div>
         </div>
         <div class="footer">
           <div>기준: 5.18.0 이후, GO.Hanpass 포함</div>
@@ -636,7 +667,7 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-15 13:05:12",
+  "generatedAt": "2026-05-15 13:07:43",
   "rows": [
     {
       "id": "ISSUE-807",
