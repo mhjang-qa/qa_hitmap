@@ -78,6 +78,70 @@
       gap: 10px;
       margin-bottom: 10px;
     }
+    .growth {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 10px;
+      align-items: stretch;
+      margin-bottom: 10px;
+      background: var(--surface-panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .growth-title {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+    .growth-title strong {
+      display: block;
+      margin-top: 4px;
+      color: var(--text);
+      font-size: 18px;
+      line-height: 1.1;
+    }
+    .funnel {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .funnel-step {
+      min-width: 0;
+      border-radius: 7px;
+      padding: 8px 9px;
+      background: rgba(255, 255, 255, .48);
+      border: 1px solid var(--line);
+    }
+    .funnel-label {
+      color: var(--muted);
+      font-size: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .funnel-value {
+      margin-top: 4px;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .funnel-bar {
+      height: 5px;
+      margin-top: 7px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: rgba(120, 113, 108, .16);
+    }
+    .funnel-bar > span {
+      display: block;
+      height: 100%;
+      width: var(--w, 0%);
+      border-radius: inherit;
+      background: linear-gradient(90deg, #38bdf8, #2563eb);
+    }
+    .funnel-step.delta .funnel-value { color: #dc2626; }
+    .funnel-step.delta .funnel-bar > span { background: linear-gradient(90deg, #fbbf24, #dc2626); }
     .card {
       background: var(--surface-panel);
       border: 1px solid var(--line);
@@ -158,7 +222,7 @@
       gap: 8px;
       margin-bottom: 10px;
     }
-    .tabs { display: flex; flex-wrap: wrap; gap: 7px; }
+    .tabs, .view-switch { display: flex; flex-wrap: wrap; gap: 7px; }
     .tab {
       border: 1px solid var(--tab-line);
       background: var(--tab-bg);
@@ -177,6 +241,28 @@
       grid-auto-rows: 92px;
       gap: 6px;
     }
+    .chart {
+      min-height: 260px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: rgba(255, 255, 255, .38);
+    }
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .chart-head strong { color: var(--text); font-size: 13px; }
+    .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .axis-label { fill: currentColor; color: var(--muted); font-size: 10px; }
+    .chart-count { fill: currentColor; color: var(--text); font-size: 10px; font-weight: 700; }
+    .trend-line { fill: none; stroke: #2563eb; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .trend-dot { fill: #dc2626; stroke: rgba(255, 255, 255, .7); stroke-width: 2; }
+    .trend-bar { fill: rgba(37, 99, 235, .22); }
     .tile {
       position: relative;
       border: 0;
@@ -228,6 +314,8 @@
       .header { align-items: flex-start; flex-direction: column; }
       .meta { text-align: left; }
       .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .growth { grid-template-columns: 1fr; }
+      .funnel { grid-template-columns: 1fr; }
       .toolbar { align-items: flex-start; flex-direction: column; }
       .heatmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
@@ -266,22 +354,26 @@
       </div>
     </div>
 
+    <div class="growth" id="growthFunnel"></div>
+
     <details class="panel" open>
       <summary>결함 상세</summary>
       <div class="panel-body">
         <div class="toolbar">
           <div class="tabs" id="tabs"></div>
-          <div class="legend">
-            낮음
-            <span class="legend-box blue"></span>
-            <span class="legend-box orange"></span>
-            <span class="legend-box red1"></span>
-            <span class="legend-box red2"></span>
-            <span class="legend-box red3"></span>
-            높음
+          <div class="view-switch" id="viewSwitch"></div>
+          <div class="legend" id="legend">
+              낮음
+              <span class="legend-box blue"></span>
+              <span class="legend-box orange"></span>
+              <span class="legend-box red1"></span>
+              <span class="legend-box red2"></span>
+              <span class="legend-box red3"></span>
+              높음
           </div>
         </div>
         <div class="heatmap" id="heatmap"></div>
+        <div class="chart" id="versionChart" hidden></div>
         <div class="footer">
           <div>기준: 5.18.0 이후, GO.Hanpass 포함</div>
           <div>영역: 결함 요약 첫 태그</div>
@@ -292,8 +384,21 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-14 17:10:58",
+  "generatedAt": "2026-05-15 09:28:30",
   "rows": [
+    {
+      "id": "ISSUE-802",
+      "title": "[관광객카드]  ‘카드 신청 취소 완료’ 팝업 Dim 영역 닫기 후 ‘신청 취소' 중복 요청 시 시스템 장애 팝업 노출",
+      "area": "관광객카드",
+      "defectType": "성능",
+      "targetVersion": "[G.H]v1.0.0",
+      "domain": "방한 고한패스",
+      "severity": "Major",
+      "status": "등록 (Registered)",
+      "priority": "보통",
+      "createdAt": "2026-05-14T08:53:00.000Z",
+      "url": "https://www.notion.so/Dim-36073fbd1951801c8b90f035fdc1260b"
+    },
     {
       "id": "ISSUE-801",
       "title": "[관광객카드] 다국어 설정 시 ‘KT 결제 정보 안내’ 화면 내 ‘선결제 할인’ 다국어 미적용 및 텍스트 영역 이탈 결함",
@@ -302,7 +407,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "처리중 (In Progress)",
       "priority": "보통",
       "createdAt": "2026-05-14T08:01:00.000Z",
       "url": "https://www.notion.so/KT-36073fbd19518091b5a7f348d8da2448"
@@ -523,7 +628,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "개발 완료 (Dev Done)",
+      "status": "QA 검증 -회귀 (QA Verification)",
       "priority": "보통",
       "createdAt": "2026-05-14T01:16:00.000Z",
       "url": "https://www.notion.so/KT-36073fbd195180a5ba24f86c925f260b"
@@ -562,7 +667,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "개발 완료 (Dev Done)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-05-13T00:53:00.000Z",
       "url": "https://www.notion.so/tab-35f73fbd19518064938ded46dfac4d8c"
@@ -1173,7 +1278,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "개발 완료 (Dev Done)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-05-12T04:22:00.000Z",
       "url": "https://www.notion.so/35e73fbd1951802890ace3b465f8a6db"
@@ -1238,7 +1343,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "개발 완료 (Dev Done)",
+      "status": "QA 검증 -회귀 (QA Verification)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:39:00.000Z",
       "url": "https://www.notion.so/35e73fbd1951801dabe1cf2ce9c735bb"
@@ -1446,7 +1551,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "개발 완료 (Dev Done)",
+      "status": "QA 검증 -회귀 (QA Verification)",
       "priority": "보통",
       "createdAt": "2026-05-12T00:50:00.000Z",
       "url": "https://www.notion.so/x-35e73fbd1951805d9131d6edb30201ba"
@@ -4703,13 +4808,13 @@
     }
   ],
   "summary": {
-    "total": 339,
-    "open": 88,
+    "total": 340,
+    "open": 89,
     "futureFix": 12,
-    "majorPlus": 88,
+    "majorPlus": 89,
     "critical": 20,
     "domains": {
-      "방한 고한패스": 89,
+      "방한 고한패스": 90,
       "한패스": 250
     }
   }
@@ -4720,7 +4825,12 @@
       { key: "gohanpass", label: "방한 고한패스" },
       { key: "major", label: "Major+" }
     ];
+    const VIEW_MODES = [
+      { key: "heatmap", label: "히트맵" },
+      { key: "version", label: "버전 추이" }
+    ];
     let activeFilter = "all";
+    let activeView = "heatmap";
 
     function isDone(row) {
       return row.status.includes("완료") ||
@@ -4777,7 +4887,9 @@
             severities: {},
             types: {},
             domains: {},
-            examples: []
+            examples: [],
+            landingUrl: "",
+            landingTitle: ""
           });
         }
         const item = map.get(row.area);
@@ -4789,6 +4901,10 @@
         item.types[row.defectType] = (item.types[row.defectType] || 0) + 1;
         item.domains[row.domain] = (item.domains[row.domain] || 0) + 1;
         if (item.examples.length < 3) item.examples.push(row.title);
+        if (!item.landingUrl && row.url) {
+          item.landingUrl = row.url;
+          item.landingTitle = row.title;
+        }
       });
       return Array.from(map.values()).sort((a, b) =>
         b.count - a.count || b.majorPlus - a.majorPlus || a.area.localeCompare(b.area, "ko")
@@ -4816,6 +4932,76 @@
       });
     }
 
+    function renderViewSwitch() {
+      const viewSwitch = document.getElementById("viewSwitch");
+      viewSwitch.innerHTML = "";
+      VIEW_MODES.forEach(view => {
+        const button = document.createElement("button");
+        button.className = `tab ${activeView === view.key ? "active" : ""}`;
+        button.type = "button";
+        button.textContent = view.label;
+        button.addEventListener("click", () => {
+          activeView = view.key;
+          render();
+        });
+        viewSwitch.appendChild(button);
+      });
+    }
+
+    function dateKey(row) {
+      return row.createdAt ? row.createdAt.slice(0, 10) : "";
+    }
+
+    function renderGrowthFunnel(rows) {
+      const container = document.getElementById("growthFunnel");
+      const counts = new Map();
+      rows.forEach(row => {
+        const key = dateKey(row);
+        if (!key) return;
+        counts.set(key, (counts.get(key) || 0) + 1);
+      });
+
+      const dates = Array.from(counts.keys()).sort();
+      if (!dates.length) {
+        container.innerHTML = '<div class="growth-title">이전일 대비<strong>-</strong></div><div class="funnel"><div class="empty">생성일 데이터가 없습니다.</div></div>';
+        return;
+      }
+
+      const latest = dates[dates.length - 1];
+      const previous = dates.length > 1 ? dates[dates.length - 2] : "";
+      const latestCount = counts.get(latest) || 0;
+      const previousCount = previous ? counts.get(previous) || 0 : 0;
+      const delta = latestCount - previousCount;
+      const max = Math.max(latestCount, previousCount, Math.abs(delta), 1);
+      const deltaText = delta > 0 ? `+${delta}` : String(delta);
+      const deltaLabel = previous ? `${previous} 대비` : "비교일 없음";
+
+      container.innerHTML = `
+        <div class="growth-title">
+          이전일 대비 결함 증가
+          <strong>${deltaText}건</strong>
+          <span>${deltaLabel}</span>
+        </div>
+        <div class="funnel">
+          <div class="funnel-step">
+            <div class="funnel-label">이전 집계일 ${previous || "-"}</div>
+            <div class="funnel-value">${previousCount}건</div>
+            <div class="funnel-bar"><span style="--w: ${Math.round((previousCount / max) * 100)}%"></span></div>
+          </div>
+          <div class="funnel-step">
+            <div class="funnel-label">최신 집계일 ${latest}</div>
+            <div class="funnel-value">${latestCount}건</div>
+            <div class="funnel-bar"><span style="--w: ${Math.round((latestCount / max) * 100)}%"></span></div>
+          </div>
+          <div class="funnel-step delta">
+            <div class="funnel-label">증가분</div>
+            <div class="funnel-value">${deltaText}건</div>
+            <div class="funnel-bar"><span style="--w: ${Math.round((Math.abs(delta) / max) * 100)}%"></span></div>
+          </div>
+        </div>
+      `;
+    }
+
     function renderSummary(rows) {
       const total = rows.length;
       const open = rows.filter(row => !isDone(row) && !isFutureFix(row)).length;
@@ -4837,6 +5023,80 @@
         `Major+ ${majorPlus} / ${Object.entries(domainCounts).map(([key, value]) => `${key} ${value}`).join(" / ") || "-"}`;
     }
 
+    function versionSortKey(version) {
+      const normalized = String(version || "").replace(/\s+/g, "");
+      const plain = normalized.match(/^(\d+)\.(\d+)\.(\d+)$/);
+      if (plain) return [0, Number(plain[1]), Number(plain[2]), Number(plain[3])];
+      const gh = normalized.toUpperCase().match(/^\[G\.?H\]V?(\d+)\.(\d+)\.(\d+)$/);
+      if (gh) return [1, Number(gh[1]), Number(gh[2]), Number(gh[3])];
+      return [2, normalized];
+    }
+
+    function compareVersions(a, b) {
+      const left = versionSortKey(a);
+      const right = versionSortKey(b);
+      for (let index = 0; index < Math.max(left.length, right.length); index += 1) {
+        if ((left[index] ?? 0) < (right[index] ?? 0)) return -1;
+        if ((left[index] ?? 0) > (right[index] ?? 0)) return 1;
+      }
+      return String(a).localeCompare(String(b), "ko");
+    }
+
+    function renderVersionChart(rows) {
+      const chart = document.getElementById("versionChart");
+      const versionMap = new Map();
+      rows.forEach(row => {
+        const version = row.targetVersion || "미지정";
+        if (!versionMap.has(version)) {
+          versionMap.set(version, { version, total: 0, open: 0, majorPlus: 0 });
+        }
+        const item = versionMap.get(version);
+        item.total += 1;
+        if (!isDone(row) && !isFutureFix(row)) item.open += 1;
+        if (isMajorPlus(row)) item.majorPlus += 1;
+      });
+
+      const items = Array.from(versionMap.values()).sort((a, b) => compareVersions(a.version, b.version));
+      if (!items.length) {
+        chart.innerHTML = '<div class="empty">표시할 버전 데이터가 없습니다.</div>';
+        return;
+      }
+
+      const width = 960;
+      const height = 250;
+      const padX = 44;
+      const padY = 28;
+      const plotW = width - padX * 2;
+      const plotH = height - padY * 2;
+      const max = Math.max(...items.map(item => item.total), 1);
+      const step = items.length > 1 ? plotW / (items.length - 1) : plotW;
+      const points = items.map((item, index) => {
+        const x = padX + (items.length > 1 ? index * step : plotW / 2);
+        const y = padY + plotH - (item.total / max) * plotH;
+        return { ...item, x, y };
+      });
+      const path = points.map(point => `${point.x},${point.y}`).join(" ");
+
+      chart.innerHTML = `
+        <div class="chart-head">
+          <strong>타겟 버전별 결함 추이</strong>
+          <span>총 ${rows.length}건 / 버전 ${items.length}개</span>
+        </div>
+        <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="타겟 버전별 결함 추이 그래프">
+          <line x1="${padX}" y1="${height - padY}" x2="${width - padX}" y2="${height - padY}" stroke="currentColor" opacity=".18" />
+          ${points.map(point => `
+            <rect class="trend-bar" x="${point.x - 14}" y="${point.y}" width="28" height="${height - padY - point.y}" rx="5"></rect>
+          `).join("")}
+          <polyline class="trend-line" points="${path}"></polyline>
+          ${points.map((point, index) => `
+            <circle class="trend-dot" cx="${point.x}" cy="${point.y}" r="5"></circle>
+            <text class="chart-count" x="${point.x}" y="${point.y - 10}" text-anchor="middle">${point.total}</text>
+            <text class="axis-label" x="${point.x}" y="${height - 8}" text-anchor="middle">${point.version}</text>
+          `).join("")}
+        </svg>
+      `;
+    }
+
     function renderHeatmap(groups) {
       const heatmap = document.getElementById("heatmap");
       heatmap.innerHTML = "";
@@ -4854,9 +5114,15 @@
         tile.title = [
           `${group.area}: ${group.count}건`,
           `Major+ ${group.majorPlus}건`,
+          group.landingTitle ? `클릭 시 이동: ${group.landingTitle}` : "연결된 Notion URL 없음",
           `주요 유형: ${topLabel(group.types)}`,
           ...group.examples
         ].join("\n");
+        if (group.landingUrl) {
+          tile.addEventListener("click", () => {
+            window.open(group.landingUrl, "_blank", "noopener");
+          });
+        }
         tile.innerHTML = `
           <div class="badge">${group.majorPlus ? "Major+ " + group.majorPlus : "Minor 중심"}</div>
           <div class="area">${group.area}</div>
@@ -4870,9 +5136,24 @@
 
     function render() {
       renderTabs();
+      renderViewSwitch();
       const filtered = rowsByFilter();
       renderSummary(filtered);
-      renderHeatmap(groupRows(filtered));
+      renderGrowthFunnel(filtered);
+      const heatmap = document.getElementById("heatmap");
+      const chart = document.getElementById("versionChart");
+      const legend = document.getElementById("legend");
+      if (activeView === "version") {
+        heatmap.hidden = true;
+        legend.hidden = true;
+        chart.hidden = false;
+        renderVersionChart(filtered);
+      } else {
+        chart.hidden = true;
+        heatmap.hidden = false;
+        legend.hidden = false;
+        renderHeatmap(groupRows(filtered));
+      }
       document.getElementById("updatedAt").textContent = DATA.generatedAt;
     }
 
