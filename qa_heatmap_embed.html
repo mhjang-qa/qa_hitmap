@@ -183,15 +183,13 @@
       padding: 0;
       overflow: hidden;
     }
-    .panel > summary {
-      cursor: pointer;
-      list-style: none;
+    .panel-title {
       padding: 9px 12px;
       color: var(--text);
       font-size: 12px;
       font-weight: 700;
     }
-    .panel > summary::before {
+    .panel-title::before {
       content: "";
       display: inline-block;
       width: 8px;
@@ -201,15 +199,6 @@
       background: linear-gradient(135deg, #2563eb, #dc2626);
       vertical-align: 1px;
     }
-    .panel > summary::-webkit-details-marker { display: none; }
-    .panel > summary::after {
-      content: "펼치기";
-      float: right;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 500;
-    }
-    .panel[open] > summary::after { content: "접기"; }
     .panel-body {
       border-top: 1px solid var(--line);
       padding: 10px;
@@ -240,6 +229,7 @@
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 10px;
       align-items: start;
+      min-height: 720px;
       max-height: 760px;
       overflow-x: hidden;
       overflow-y: auto;
@@ -596,8 +586,8 @@
 
     <div class="growth" id="growthFunnel"></div>
 
-    <details class="panel" open>
-      <summary>결함 상세</summary>
+    <section class="panel">
+      <div class="panel-title">결함 상세</div>
       <div class="panel-body">
         <div class="toolbar">
           <div class="tabs" id="tabs"></div>
@@ -641,12 +631,12 @@
           <div>영역: 결함 요약 첫 태그</div>
         </div>
       </div>
-    </details>
+    </section>
   </div>
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-15 13:02:44",
+  "generatedAt": "2026-05-15 13:05:12",
   "rows": [
     {
       "id": "ISSUE-807",
