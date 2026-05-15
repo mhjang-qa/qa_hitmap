@@ -45,15 +45,20 @@
         --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, .08);
       }
     }
+    html, body {
+      height: 100%;
+    }
     body {
       margin: 0;
       padding: 10px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: transparent;
       color: var(--text);
+      overflow: hidden;
     }
     .dashboard {
       width: 100%;
+      height: calc(100vh - 20px);
       max-width: none;
       min-width: 960px;
       margin: 0 auto;
@@ -61,6 +66,9 @@
       border: 0;
       border-radius: 0;
       padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
     }
     .header {
       display: flex;
@@ -182,6 +190,10 @@
       border-radius: 8px;
       padding: 0;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1 1 auto;
     }
     .panel > summary {
       cursor: pointer;
@@ -213,6 +225,10 @@
     .panel-body {
       border-top: 1px solid var(--line);
       padding: 10px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1 1 auto;
     }
     .toolbar {
       display: flex;
@@ -240,9 +256,13 @@
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 10px;
       align-items: stretch;
+      min-height: 0;
+      overflow: auto;
+      padding-right: 4px;
     }
     .detail-card {
       min-width: 0;
+      min-height: 0;
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 10px;
@@ -264,7 +284,7 @@
     .heatmap {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-auto-rows: 104px;
+      grid-auto-rows: 92px;
       gap: 6px;
       grid-auto-flow: dense;
     }
@@ -406,6 +426,17 @@
     .tile:hover { filter: brightness(0.96); }
     .tile.large { grid-column: span 2; grid-row: span 2; }
     .tile.medium { grid-row: span 2; }
+    .tile.small {
+      align-self: center;
+      min-height: 64px;
+      max-height: 72px;
+      padding: 7px;
+    }
+    .tile.small .area { font-size: 12px; }
+    .tile.small .count { font-size: 14px; margin-top: 3px; }
+    .tile.small .detail { display: none; }
+    .tile.small .badge,
+    .tile.small .ratio { font-size: 8px; }
     .area { font-weight: 800; font-size: 13px; line-height: 1.2; word-break: keep-all; }
     .count { margin-top: 5px; font-size: 16px; font-weight: 800; }
     .detail { margin-top: 5px; font-size: 10px; opacity: .9; }
@@ -446,6 +477,7 @@
       .detail-grid { grid-template-columns: 1fr; }
       .heatmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .tile.large, .tile.medium { grid-column: span 1; grid-row: span 1; }
+      .tile.small { max-height: none; }
       .distribution { grid-template-columns: 1fr; }
     }
   </style>
@@ -526,8 +558,47 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-15 10:38:45",
+  "generatedAt": "2026-05-15 11:44:21",
   "rows": [
+    {
+      "id": "ISSUE-807",
+      "title": "[관광객카드] [공통]카드 등록 후 ‘한패스 카드 목록 진입 시 신청하기 BTN 미노출 현상",
+      "area": "관광객카드",
+      "defectType": "성능",
+      "targetVersion": "[G.H]v1.0.0",
+      "domain": "방한 고한패스",
+      "severity": "Major",
+      "status": "등록 (Registered)",
+      "priority": "보통",
+      "createdAt": "2026-05-15T02:00:00.000Z",
+      "url": "https://www.notion.so/BTN-36173fbd1951804f9860c3f392ec9320"
+    },
+    {
+      "id": "ISSUE-806",
+      "title": "[관광객카드] 카드 등록 후 비밀번호 설정 시 ‘시스템 장애’ 팝업 노출 (카드 등록 불가)",
+      "area": "관광객카드",
+      "defectType": "성능",
+      "targetVersion": "[G.H]v1.0.0",
+      "domain": "방한 고한패스",
+      "severity": "Major",
+      "status": "등록 (Registered)",
+      "priority": "보통",
+      "createdAt": "2026-05-15T01:50:00.000Z",
+      "url": "https://www.notion.so/36173fbd195180ca844cc355c4627d00"
+    },
+    {
+      "id": "ISSUE-805",
+      "title": "[관광객카드] ‘GO Hanpass 카드 상세’ 화면 내 혜택 영역 ‘캐시백’ 문구 색상 기획서와 상이 ",
+      "area": "관광객카드",
+      "defectType": "UX/UI",
+      "targetVersion": "[G.H]v1.0.0",
+      "domain": "방한 고한패스",
+      "severity": "Minor",
+      "status": "등록 (Registered)",
+      "priority": "보통",
+      "createdAt": "2026-05-15T01:39:00.000Z",
+      "url": "https://www.notion.so/GO-Hanpass-36173fbd19518085aa93dc80b619910d"
+    },
     {
       "id": "ISSUE-803",
       "title": "[관광객카드] 결제 실패 페이지 - [확인] 버튼 선택 시 홈 탭으로 이동하지 않는 현상",
@@ -2051,8 +2122,8 @@
     },
     {
       "id": "ISSUE-638",
-      "title": "[게임][만보기][앱 흔들기][공통] 미수령 포인트 안내 팝업 내 '나가기' 클릭 시 영문 화면으로 비정상 이동 ",
-      "area": "게임",
+      "title": "[게이미피케이션][만보기][앱 흔들기][공통] 미수령 포인트 안내 팝업 내 '나가기' 클릭 시 영문 화면으로 비정상 이동 ",
+      "area": "게이미피케이션",
       "defectType": "접근성",
       "targetVersion": "5.21.0",
       "domain": "한패스",
@@ -4014,8 +4085,8 @@
     },
     {
       "id": "ISSUE-443",
-      "title": "[Live][통합 QR 결제][iOS]로그인 후 통합 QR 결제 진입 시 Decode Error 팝업 발생",
-      "area": "Live",
+      "title": "[통합 QR 결제][iOS]로그인 후 통합 QR 결제 진입 시 Decode Error 팝업 발생",
+      "area": "통합 QR 결제",
       "defectType": "기능",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4023,12 +4094,12 @@
       "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-03-31T02:30:00.000Z",
-      "url": "https://www.notion.so/Live-QR-iOS-QR-Decode-Error-33473fbd1951804f9d68d629612899ca"
+      "url": "https://www.notion.so/QR-iOS-QR-Decode-Error-33473fbd1951804f9d68d629612899ca"
     },
     {
       "id": "ISSUE-442",
-      "title": "[Live][통합 QR 결제][AOS] 로그인 후 통합 QR 결제 진입 시 앱 크래시 발생",
-      "area": "Live",
+      "title": "[통합 QR 결제][AOS] 로그인 후 통합 QR 결제 진입 시 앱 크래시 발생",
+      "area": "통합 QR 결제",
       "defectType": "기능",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4036,7 +4107,7 @@
       "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-03-31T02:14:00.000Z",
-      "url": "https://www.notion.so/Live-QR-AOS-QR-33473fbd195180b199cdff45a5fa4aac"
+      "url": "https://www.notion.so/QR-AOS-QR-33473fbd195180b199cdff45a5fa4aac"
     },
     {
       "id": "ISSUE-441",
@@ -4963,13 +5034,13 @@
     }
   ],
   "summary": {
-    "total": 341,
-    "open": 90,
+    "total": 344,
+    "open": 93,
     "futureFix": 12,
-    "majorPlus": 89,
+    "majorPlus": 91,
     "critical": 20,
     "domains": {
-      "방한 고한패스": 91,
+      "방한 고한패스": 94,
       "한패스": 250
     }
   }
@@ -5022,6 +5093,7 @@
     function sizeByRank(index, count, maxCount) {
       if (index === 0 && maxCount >= 4) return "large";
       if (index < 4 && count >= Math.max(3, Math.ceil(maxCount * .45))) return "medium";
+      if (count < 10) return "small";
       return "";
     }
 
