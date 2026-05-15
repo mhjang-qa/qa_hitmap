@@ -255,10 +255,27 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 10px;
-      align-items: stretch;
+      align-items: start;
       min-height: 0;
-      overflow: auto;
+      height: 0;
+      flex: 1 1 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
       padding-right: 4px;
+    }
+    .detail-grid::-webkit-scrollbar {
+      width: 10px;
+    }
+    .detail-grid::-webkit-scrollbar-track {
+      background: rgba(120, 113, 108, .12);
+      border-radius: 99px;
+    }
+    .detail-grid::-webkit-scrollbar-thumb {
+      background: rgba(120, 113, 108, .42);
+      border-radius: 99px;
+      border: 2px solid transparent;
+      background-clip: content-box;
     }
     .detail-card {
       min-width: 0;
@@ -558,7 +575,7 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-15 11:44:21",
+  "generatedAt": "2026-05-15 11:48:48",
   "rows": [
     {
       "id": "ISSUE-807",
