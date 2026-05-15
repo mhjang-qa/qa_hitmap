@@ -299,11 +299,12 @@
       font-size: 13px;
     }
     .heatmap {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-auto-rows: 92px;
-      gap: 6px;
-      grid-auto-flow: dense;
+      position: relative;
+      height: 560px;
+      min-height: 420px;
+      overflow: hidden;
+      border-radius: 8px;
+      background: rgba(120, 113, 108, .08);
     }
     .chart {
       min-height: 480px;
@@ -440,15 +441,17 @@
       min-width: 0;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18);
     }
-    .tile:hover { filter: brightness(0.96); }
-    .tile.large { grid-column: span 2; grid-row: span 2; }
-    .tile.medium { grid-row: span 2; }
-    .tile.small {
-      align-self: center;
-      min-height: 64px;
-      max-height: 72px;
-      padding: 7px;
+    .heatmap .tile {
+      position: absolute;
+      width: var(--w);
+      height: var(--h);
+      left: var(--x);
+      top: var(--y);
+      min-width: 0;
+      min-height: 0;
     }
+    .tile:hover { filter: brightness(0.96); }
+    .tile.small { padding: 6px; }
     .tile.small .area { font-size: 12px; }
     .tile.small .count { font-size: 14px; margin-top: 3px; }
     .tile.small .detail { display: none; }
@@ -492,9 +495,7 @@
       .funnel { grid-template-columns: 1fr; }
       .toolbar { align-items: flex-start; flex-direction: column; }
       .detail-grid { grid-template-columns: 1fr; }
-      .heatmap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .tile.large, .tile.medium { grid-column: span 1; grid-row: span 1; }
-      .tile.small { max-height: none; }
+      .heatmap { height: 520px; }
       .distribution { grid-template-columns: 1fr; }
     }
   </style>
@@ -575,7 +576,7 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-15 11:48:48",
+  "generatedAt": "2026-05-15 11:51:38",
   "rows": [
     {
       "id": "ISSUE-807",
@@ -5107,13 +5108,6 @@
       return "gray";
     }
 
-    function sizeByRank(index, count, maxCount) {
-      if (index === 0 && maxCount >= 4) return "large";
-      if (index < 4 && count >= Math.max(3, Math.ceil(maxCount * .45))) return "medium";
-      if (count < 10) return "small";
-      return "";
-    }
-
     function groupRows(rows) {
       const map = new Map();
       rows.forEach(row => {
@@ -5385,6 +5379,49 @@
       });
     }
 
+    function normalizeRect(rect) {
+      return {
+        x: rect.x,
+        y: rect.y,
+        w: Math.max(0, rect.w),
+        h: Math.max(0, rect.h)
+      };
+    }
+
+    function splitTreemap(items, rect) {
+      if (!items.length) return [];
+      if (items.length === 1) return [{ item: items[0], rect: normalizeRect(rect) }];
+
+      const total = items.reduce((sum, item) => sum + item.count, 0);
+      const half = total / 2;
+      let acc = 0;
+      let splitIndex = 0;
+      for (let index = 0; index < items.length - 1; index += 1) {
+        if (acc + items[index].count > half && index > 0) break;
+        acc += items[index].count;
+        splitIndex = index + 1;
+      }
+
+      const leftItems = items.slice(0, splitIndex);
+      const rightItems = items.slice(splitIndex);
+      const leftTotal = leftItems.reduce((sum, item) => sum + item.count, 0);
+      const ratio = total ? leftTotal / total : .5;
+
+      if (rect.w >= rect.h) {
+        const leftW = rect.w * ratio;
+        return [
+          ...splitTreemap(leftItems, { x: rect.x, y: rect.y, w: leftW, h: rect.h }),
+          ...splitTreemap(rightItems, { x: rect.x + leftW, y: rect.y, w: rect.w - leftW, h: rect.h })
+        ];
+      }
+
+      const topH = rect.h * ratio;
+      return [
+        ...splitTreemap(leftItems, { x: rect.x, y: rect.y, w: rect.w, h: topH }),
+        ...splitTreemap(rightItems, { x: rect.x, y: rect.y + topH, w: rect.w, h: rect.h - topH })
+      ];
+    }
+
     function renderHeatmap(groups) {
       const heatmap = document.getElementById("heatmap");
       heatmap.innerHTML = "";
@@ -5394,11 +5431,23 @@
       }
 
       const maxCount = Math.max(...groups.map(group => group.count));
-      groups.forEach((group, index) => {
+      const width = heatmap.clientWidth || 720;
+      const height = heatmap.clientHeight || 560;
+      const gap = 4;
+      const layout = splitTreemap(groups, { x: 0, y: 0, w: width, h: height });
+
+      layout.forEach((entry, index) => {
+        const group = entry.item;
+        const rect = entry.rect;
         const tile = document.createElement("button");
         const color = colorByScore(group.count, group.majorPlus, maxCount);
-        tile.className = `tile ${color} ${sizeByRank(index, group.count, maxCount)}`;
+        const isSmall = group.count < 10 || rect.w < 120 || rect.h < 90;
+        tile.className = `tile ${color} ${isSmall ? "small" : ""}`;
         tile.type = "button";
+        tile.style.setProperty("--x", `${rect.x + gap / 2}px`);
+        tile.style.setProperty("--y", `${rect.y + gap / 2}px`);
+        tile.style.setProperty("--w", `${Math.max(24, rect.w - gap)}px`);
+        tile.style.setProperty("--h", `${Math.max(24, rect.h - gap)}px`);
         tile.title = [
           `${group.area}: ${group.count}건`,
           `Major+ ${group.majorPlus}건`,
@@ -5433,6 +5482,10 @@
     }
 
     render();
+    window.addEventListener("resize", () => {
+      window.clearTimeout(window.__heatmapResizeTimer);
+      window.__heatmapResizeTimer = window.setTimeout(render, 120);
+    });
   </script>
 </body>
 </html>
