@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>QA 결함 히트맵</title>
   <style>
     * { box-sizing: border-box; }
@@ -55,22 +55,31 @@
         --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, .08);
       }
     }
-    html, body {
-      height: 100%;
+    html {
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+    body {
+      width: 100%;
+      min-height: 1800px;
+      overflow-x: hidden;
     }
     body {
       margin: 0;
-      padding: 10px;
+      padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: transparent;
       color: var(--text);
-      overflow: hidden;
+      overflow-y: auto;
+      -webkit-text-size-adjust: 100%;
     }
+    img, svg, canvas { max-width: 100%; }
     .dashboard {
       width: 100%;
-      height: calc(100vh - 20px);
-      max-width: none;
-      min-width: 960px;
+      max-width: 1600px;
+      min-width: 0;
+      min-height: 1800px;
       margin: 0 auto;
       background: transparent;
       border: 0;
@@ -78,7 +87,6 @@
       padding: 0;
       display: flex;
       flex-direction: column;
-      min-height: 0;
     }
     .fixed-zone {
       flex: 0 0 auto;
@@ -95,7 +103,7 @@
     .meta { text-align: right; font-size: 11px; color: var(--muted); white-space: nowrap; }
     .summary {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 10px;
       margin-bottom: 10px;
     }
@@ -208,7 +216,7 @@
       display: flex;
       flex-direction: column;
       flex: 1 1 auto;
-      min-height: 0;
+      min-height: 1460px;
     }
     .panel-title {
       padding: 9px 12px;
@@ -308,7 +316,7 @@
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 10px;
       align-items: start;
-      min-height: 720px;
+      min-height: 1240px;
     }
     .detail-scroll::-webkit-scrollbar {
       width: 10px;
@@ -694,12 +702,18 @@
     .issue-severity.critical { color: #dc2626; font-weight: 900; }
     .issue-severity.major { color: #d97706; font-weight: 900; }
     .issue-severity.minor { color: #2563eb; font-weight: 900; }
+    @media (max-width: 1180px) {
+      .dashboard { max-width: 100%; }
+      .detail-grid { grid-template-columns: 1fr; min-height: 1320px; }
+      .heatmap { height: 620px; }
+      .chart { min-height: 520px; }
+    }
     @media (max-width: 760px) {
       body { padding: 10px; }
-      .dashboard { min-width: 0; }
+      .dashboard { min-width: 0; min-height: 1800px; }
       .header { align-items: flex-start; flex-direction: column; }
       .meta { text-align: left; }
-      .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .summary { grid-template-columns: 1fr; }
       .growth { grid-template-columns: 1fr; }
       .funnel { grid-template-columns: 1fr; }
       .toolbar { align-items: flex-start; flex-direction: column; }
@@ -818,8 +832,21 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-15 17:22:52",
+  "generatedAt": "2026-05-18 09:28:51",
   "rows": [
+    {
+      "id": "ISSUE-814",
+      "title": "[관광객카드] 결제 방식 선택 BS 내 ‘나중에 결제’ 안내 문구 기획서와 상이",
+      "area": "관광객카드",
+      "defectType": "UX/UI",
+      "targetVersion": "[G.H]v1.0.0",
+      "domain": "방한 고한패스",
+      "severity": "Minor",
+      "status": "등록 (Registered)",
+      "priority": "보통",
+      "createdAt": "2026-05-15T08:32:00.000Z",
+      "url": "https://www.notion.so/BS-36173fbd195180d4bb3ae9c8d7723349"
+    },
     {
       "id": "ISSUE-813",
       "title": "[관광객카드] PIN입력 페이지에서 물리백 선택 시 이전화면으로 (TravelCard_067_결제하기) 이동하지 않는 현상",
@@ -887,8 +914,8 @@
     },
     {
       "id": "ISSUE-808",
-      "title": "[AOS] OS 날짜 수동(과거) 변경 시 이미지 리소스 로드 실패하는 현상",
-      "area": "AOS",
+      "title": "[이미지][AOS] OS 날짜 수동(과거) 변경 시 이미지 리소스 로드 실패하는 현상",
+      "area": "이미지",
       "defectType": "접근성",
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
@@ -1361,7 +1388,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "개발 완료 (Dev Done)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-05-12T08:58:00.000Z",
       "url": "https://www.notion.so/35e73fbd1951807c8285f7d64e50f87d"
@@ -1420,7 +1447,7 @@
     },
     {
       "id": "ISSUE-765",
-      "title": "[해외송금][송금액 입력] 받는 방법 선택 BS 환율 저렴한 순으로 출력 안 되는 현상",
+      "title": "[해외송금][송금액입력] 받는 방법 선택 BS 환율 저렴한 순으로 출력 안 되는 현상",
       "area": "해외송금",
       "defectType": "정책 불일치",
       "targetVersion": "[G.H]v1.0.0",
@@ -1446,8 +1473,8 @@
     },
     {
       "id": "ISSUE-763",
-      "title": "[개선의견]외화충전 후 JKO Pay 앱 복귀 시 약 3초간 중간 화면 노출 및 뒤로가기 버튼 부재 (개선의견)",
-      "area": "개선의견",
+      "title": "[외화충전][개선의견]외화충전 후 JKO Pay 앱 복귀 시 약 3초간 중간 화면 노출 및 뒤로가기 버튼 부재",
+      "area": "외화충전",
       "defectType": "미지정",
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
@@ -1628,7 +1655,7 @@
     },
     {
       "id": "ISSUE-747",
-      "title": "[관광객카드][KT선불SIM서비스안내] 하단https://roaming.kt.com/kor/sim 페이지 진입 후 뒤로가기 버튼 미노출",
+      "title": "[관광객카드][KT선불SIM서비스안내] https://roaming.kt.com/kor/sim 페이지 진입 후 뒤로가기 버튼 미노출",
       "area": "관광객카드",
       "defectType": "UX/UI",
       "targetVersion": "[G.H]v1.0.0",
@@ -1641,8 +1668,8 @@
     },
     {
       "id": "ISSUE-746",
-      "title": "[홈] 계정 변경 로그인 시 이전 계정 경로 검색 기록 미초기화 현상 ",
-      "area": "홈",
+      "title": "[로그인] 계정 변경 로그인 시 이전 계정 경로 검색 기록 미초기화 현상 ",
+      "area": "로그인",
       "defectType": "기능",
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
@@ -1680,8 +1707,8 @@
     },
     {
       "id": "ISSUE-738",
-      "title": "[결제탭] K-Stylae PICK 상단 '<' 뒤로가기 → OS 뒤로가기 시 비정상 페이지 누적 현상",
-      "area": "결제탭",
+      "title": "[K-Style_PICK][결제탭]  상단 '<' 뒤로가기 → OS 뒤로가기 시 비정상 페이지 누적 현상",
+      "area": "K-Style_PICK",
       "defectType": "기능",
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
@@ -1689,7 +1716,7 @@
       "status": "등록 (Registered)",
       "priority": "보통",
       "createdAt": "2026-05-12T04:53:00.000Z",
-      "url": "https://www.notion.so/K-Stylae-PICK-OS-35e73fbd19518011bcaad68d57a2ed10"
+      "url": "https://www.notion.so/K-Style_PICK-OS-35e73fbd19518011bcaad68d57a2ed10"
     },
     {
       "id": "ISSUE-736",
@@ -1784,8 +1811,8 @@
     },
     {
       "id": "ISSUE-728",
-      "title": "[추가인증] 주소 업로드 가이드 이미지 상이",
-      "area": "추가인증",
+      "title": "[회원가입][추가인증] 주소 업로드 가이드 이미지 상이",
+      "area": "회원가입",
       "defectType": "UX/UI",
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
@@ -1979,7 +2006,7 @@
     },
     {
       "id": "ISSUE-692",
-      "title": "[로그아웃] 비로그인 접근 불가 메뉴 진입 상태에서 자동 로그아웃 시 로그아웃 팝업 두 번 노출 현상",
+      "title": "[로그아웃] 비로그인 접근 제한 메뉴 진입 상태에서 자동 로그아웃 시 로그아웃 안내 팝업 중복 노출 현상",
       "area": "로그아웃",
       "defectType": "정책 불일치",
       "targetVersion": "[G.H]v1.0.0",
@@ -1998,7 +2025,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "등록 (Registered)",
+      "status": "개발 완료 (Dev Done)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:24:00.000Z",
       "url": "https://www.notion.so/BO-BO-DEV-35e73fbd1951801d9da7c822d98bfb3c"
@@ -2018,13 +2045,13 @@
     },
     {
       "id": "ISSUE-688",
-      "title": "[메인][롤링배너] 프로모션 배너 진입 후 뒤로가기 기능 부재로 앱 종료 후에만 이탈 가능",
-      "area": "메인",
+      "title": "[홈][롤링배너] 프로모션 배너 진입 후 뒤로가기 기능 부재로 앱 종료 후에만 이탈 가능",
+      "area": "홈",
       "defectType": "기능",
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "등록 (Registered)",
+      "status": "결함 아님 (Not an issue)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:21:00.000Z",
       "url": "https://www.notion.so/35e73fbd195180daa69dccef39395aca"
@@ -2460,7 +2487,7 @@
     },
     {
       "id": "ISSUE-638",
-      "title": "[게이미피케이션][만보기][앱 흔들기][공통] 미수령 포인트 안내 팝업 내 '나가기' 클릭 시 영문 화면으로 비정상 이동 ",
+      "title": "[게이미피케이션][만보기][앱흔들기][공통] 미수령 포인트 안내 팝업 내 '나가기' 클릭 시 영문 화면으로 비정상 이동 ",
       "area": "게이미피케이션",
       "defectType": "접근성",
       "targetVersion": "5.21.0",
@@ -2564,7 +2591,7 @@
     },
     {
       "id": "ISSUE-628",
-      "title": "[게이미피케이션][럭키볼 뽑기] 럭키볼 뽑기 실행 후 처리중 상태 지속 및 오류 팝업 발생",
+      "title": "[게이미피케이션][럭키볼] 럭키볼 뽑기 실행 후 처리중 상태 지속 및 오류 팝업 발생",
       "area": "게이미피케이션",
       "defectType": "기능",
       "targetVersion": "5.21.0",
@@ -2577,7 +2604,7 @@
     },
     {
       "id": "ISSUE-627",
-      "title": "[게이미피케이션][앱 흔들고] 미션 제한 시간 종료 후 종료 처리되지 않고 오류 팝업 발생",
+      "title": "[게이미피케이션][앱흔들기] 미션 제한 시간 종료 후 종료 처리되지 않고 오류 팝업 발생",
       "area": "게이미피케이션",
       "defectType": "기능",
       "targetVersion": "5.21.0",
@@ -2915,8 +2942,8 @@
     },
     {
       "id": "ISSUE-591",
-      "title": "[메인 부가서비스 순서][AOS/iOS] 해외배송&픽업 명칭 상이한 현상",
-      "area": "메인 부가서비스 순서",
+      "title": "[부가서비스순서][AOS/iOS] 해외배송&픽업 명칭 상이한 현상",
+      "area": "부가서비스순서",
       "defectType": "UX/UI",
       "targetVersion": "5.21.0",
       "domain": "한패스",
@@ -2954,8 +2981,8 @@
     },
     {
       "id": "ISSUE-588",
-      "title": "[메인부가서비스순서][공통] 전체 메뉴 - 생활금융 영역 해외송금 받기 미노출 현상",
-      "area": "메인부가서비스순서",
+      "title": "[부가서비스순서][공통] 전체 메뉴 - 생활금융 영역 해외송금 받기 미노출 현상",
+      "area": "부가서비스순서",
       "defectType": "UX/UI",
       "targetVersion": "5.21.0",
       "domain": "한패스",
@@ -5372,13 +5399,13 @@
     }
   ],
   "summary": {
-    "total": 350,
-    "open": 95,
+    "total": 351,
+    "open": 94,
     "futureFix": 12,
     "majorPlus": 92,
     "critical": 20,
     "domains": {
-      "방한 고한패스": 100,
+      "방한 고한패스": 101,
       "한패스": 250
     }
   }
