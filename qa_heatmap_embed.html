@@ -71,7 +71,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: transparent;
       color: var(--text);
-      overflow-y: auto;
+      overflow: hidden;
       -webkit-text-size-adjust: 100%;
     }
     img, svg, canvas { max-width: 100%; }
@@ -79,7 +79,7 @@
       width: 100%;
       max-width: 1600px;
       min-width: 0;
-      min-height: 1800px;
+      height: calc(100vh - 20px);
       margin: 0 auto;
       background: transparent;
       border: 0;
@@ -216,7 +216,7 @@
       display: flex;
       flex-direction: column;
       flex: 1 1 auto;
-      min-height: 1460px;
+      min-height: 0;
     }
     .panel-title {
       padding: 9px 12px;
@@ -442,11 +442,60 @@
     .chart {
       min-height: 480px;
     }
-    .version-buttons {
+    .chart-head {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
       margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .chart-head strong { color: var(--text); font-size: 13px; }
+    .chart-sub {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+    .version-select-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 220px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .version-select-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .version-select {
+      min-width: 160px;
+      max-width: 260px;
+      width: 100%;
+      height: 30px;
+      border: 1px solid var(--tab-line);
+      border-radius: 7px;
+      background: var(--tab-bg);
+      color: var(--text);
+      padding: 0 8px;
+      font: inherit;
+      font-size: 12px;
+      outline: none;
+    }
+    .version-select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .14);
+    }
+    .version-select:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+    .version-buttons {
+      display: none;
     }
     .version-tab {
       border: 1px solid var(--tab-line);
@@ -462,15 +511,6 @@
       color: var(--tab-active-text);
       border-color: transparent;
     }
-    .chart-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
-      color: var(--muted);
-      font-size: 11px;
-    }
-    .chart-head strong { color: var(--text); font-size: 13px; }
     .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
     .axis-label { fill: currentColor; color: var(--muted); font-size: 15px; font-weight: 700; }
     .chart-count { fill: currentColor; color: var(--text); font-size: 15px; font-weight: 800; }
@@ -703,14 +743,14 @@
     .issue-severity.major { color: #d97706; font-weight: 900; }
     .issue-severity.minor { color: #2563eb; font-weight: 900; }
     @media (max-width: 1180px) {
-      .dashboard { max-width: 100%; }
+      .dashboard { max-width: 100%; height: calc(100vh - 20px); }
       .detail-grid { grid-template-columns: 1fr; min-height: 1320px; }
       .heatmap { height: 620px; }
       .chart { min-height: 520px; }
     }
     @media (max-width: 760px) {
       body { padding: 10px; }
-      .dashboard { min-width: 0; min-height: 1800px; }
+      .dashboard { min-width: 0; height: calc(100vh - 20px); }
       .header { align-items: flex-start; flex-direction: column; }
       .meta { text-align: left; }
       .summary { grid-template-columns: 1fr; }
@@ -785,8 +825,6 @@
               <div class="heatmap-widget">
                 <div class="heatmap-topbar">
                   <div class="heatmap-controls">
-                    <span class="hm-control">영역</span>
-                    <span class="hm-control">크기 결함 수</span>
                     <span class="hm-control">
                       <span class="swatch"><i></i><i></i><i></i><i></i></span>
                       색상 위험도
@@ -804,7 +842,16 @@
             </section>
             <section class="detail-card">
               <div class="detail-head">
-                <strong>타겟 버전별 결함 추이</strong>
+                <div>
+                  <strong>타겟 버전별 결함 추이</strong>
+                  <div class="chart-sub">최근 5개 기본 표출 / 버전 선택 가능</div>
+                </div>
+                <div class="version-select-wrap">
+                  <label class="version-select-label" for="versionSelect">버전</label>
+                  <select class="version-select" id="versionSelect" disabled></select>
+                </div>
+              </div>
+              <div class="chart-head">
                 <span id="chartMeta">-</span>
               </div>
               <div class="chart" id="versionChart"></div>
@@ -832,7 +879,7 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-18 09:28:51",
+  "generatedAt": "2026-05-18 14:00:23",
   "rows": [
     {
       "id": "ISSUE-814",
@@ -842,7 +889,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "처리중 (In Progress)",
       "priority": "보통",
       "createdAt": "2026-05-15T08:32:00.000Z",
       "url": "https://www.notion.so/BS-36173fbd195180d4bb3ae9c8d7723349"
@@ -959,7 +1006,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "기획서 수정",
       "priority": "보통",
       "createdAt": "2026-05-15T01:39:00.000Z",
       "url": "https://www.notion.so/GO-Hanpass-36173fbd19518085aa93dc80b619910d"
@@ -998,7 +1045,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "처리중 (In Progress)",
+      "status": "개발 완료 (Dev Done)",
       "priority": "보통",
       "createdAt": "2026-05-14T08:01:00.000Z",
       "url": "https://www.notion.so/KT-36073fbd19518091b5a7f348d8da2448"
@@ -1011,7 +1058,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "기획서 수정",
       "priority": "보통",
       "createdAt": "2026-05-14T07:33:00.000Z",
       "url": "https://www.notion.so/PIN-6-36073fbd1951809da574fa1608ddb403"
@@ -1024,7 +1071,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "처리중 (In Progress)",
       "priority": "보통",
       "createdAt": "2026-05-14T06:48:00.000Z",
       "url": "https://www.notion.so/PIN-36073fbd195180ee9b52f97093f10d63"
@@ -1128,7 +1175,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "개발 완료 (Dev Done)",
+      "status": "QA 검증 -회귀 (QA Verification)",
       "priority": "보통",
       "createdAt": "2026-05-14T04:31:00.000Z",
       "url": "https://www.notion.so/36073fbd1951808f8100d96787a3caa3"
@@ -1193,7 +1240,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "개발 완료 (Dev Done)",
+      "status": "QA 검증 -회귀 (QA Verification)",
       "priority": "보통",
       "createdAt": "2026-05-14T02:19:00.000Z",
       "url": "https://www.notion.so/SIM-36073fbd195180a49c53e95a3cc70246"
@@ -1947,7 +1994,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "처리중 (In Progress)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:37:00.000Z",
       "url": "https://www.notion.so/35e73fbd195180389912f3f2bc11674e"
@@ -1960,7 +2007,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "처리중 (In Progress)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:34:00.000Z",
       "url": "https://www.notion.so/35e73fbd195180569904e495d235069c"
@@ -1973,7 +2020,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "배정 (Assigned)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:33:00.000Z",
       "url": "https://www.notion.so/35e73fbd19518044b5aeca5ce27106ed"
@@ -1986,7 +2033,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "등록 (Registered)",
+      "status": "추척 관찰-백로그",
       "priority": "보통",
       "createdAt": "2026-05-12T02:32:00.000Z",
       "url": "https://www.notion.so/K-Style-PICK-35e73fbd1951800fa58bca438dcd13a0"
@@ -1999,7 +2046,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "등록 (Registered)",
+      "status": "배정 (Assigned)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:28:00.000Z",
       "url": "https://www.notion.so/35e73fbd195180b0a619f9e9a6cbbd28"
@@ -2012,7 +2059,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "처리중 (In Progress)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:26:00.000Z",
       "url": "https://www.notion.so/35e73fbd195180afb334eba8ddd41b12"
@@ -2025,7 +2072,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "개발 완료 (Dev Done)",
+      "status": "결함 아님 (Not an issue)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:24:00.000Z",
       "url": "https://www.notion.so/BO-BO-DEV-35e73fbd1951801d9da7c822d98bfb3c"
@@ -2181,7 +2228,7 @@
       "targetVersion": "5.21.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "개발 완료 (Dev Done)",
+      "status": "QA 검증 -회귀 (QA Verification)",
       "priority": "보통",
       "createdAt": "2026-05-11T05:57:00.000Z",
       "url": "https://www.notion.so/AOS-35d73fbd195180759435d1ef0eff03ee"
@@ -2402,7 +2449,7 @@
       "targetVersion": "5.21.0",
       "domain": "한패스",
       "severity": "Major",
-      "status": "개발 완료 (Dev Done)",
+      "status": "QA 검증 -회귀 (QA Verification)",
       "priority": "보통",
       "createdAt": "2026-05-08T06:29:00.000Z",
       "url": "https://www.notion.so/ON-35a73fbd1951807abe60f791c43b2bd1"
@@ -3559,7 +3606,7 @@
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-03T07:14:00.000Z",
       "url": "https://www.notion.so/33773fbd19518070a244c815ec149e20"
@@ -3572,7 +3619,7 @@
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-03T06:49:00.000Z",
       "url": "https://www.notion.so/BO-Y-N-UI-33773fbd195180639bf3ec462e9e9538"
@@ -3585,7 +3632,7 @@
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-03T05:34:00.000Z",
       "url": "https://www.notion.so/10-33773fbd1951801ab30cd352fac6a650"
@@ -3618,8 +3665,8 @@
     },
     {
       "id": "ISSUE-518",
-      "title": "[방한홈>한패스앱][기명회원 전환] '방한 홈' 가입 계정으로 '한패스 앱' 내 추가 인증 시 휴대폰 번호 입력 후 무반응 결함",
-      "area": "방한홈>한패스앱",
+      "title": "[추가인증][기명회원전환] '방한 홈' 가입 계정으로 '한패스 앱' 내 추가 인증 시 휴대폰 번호 입력 후 무반응 결함",
+      "area": "추가인증",
       "defectType": "기능",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -3631,13 +3678,13 @@
     },
     {
       "id": "ISSUE-517",
-      "title": "[방한홈>한패스앱][기명회원 전환] '방한 홈' 가입자가 ‘방한 홈’ 전화번호로 ‘한패스 앱’ 추가 인증 시 '이미 가입된 번호' 팝업(Popup) 오노출 결함",
-      "area": "방한홈>한패스앱",
+      "title": "[추가인증][기명회원전환] '방한 홈' 가입자가 ‘방한 홈’ 전화번호로 ‘한패스 앱’ 추가 인증 시 '이미 가입된 번호' 팝업(Popup) 오노출 결함",
+      "area": "추가인증",
       "defectType": "기능",
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Critical",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-03T04:31:00.000Z",
       "url": "https://www.notion.so/Popup-33773fbd1951808ea1cbf5fd8990cafb"
@@ -3709,7 +3756,7 @@
     },
     {
       "id": "ISSUE-507",
-      "title": "[회원가입][기명회원 전환][AOS] '주소 사진 확인' 화면 내 버튼 문구 기획서와 불일치 결함 (iOS 미발생)",
+      "title": "[회원가입][기명회원전환][AOS] '주소 사진 확인' 화면 내 버튼 문구 기획서와 불일치 결함 (iOS 미발생)",
       "area": "회원가입",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
@@ -3735,7 +3782,7 @@
     },
     {
       "id": "ISSUE-505",
-      "title": "[회원가입][기명회원 전환][AOS] '직접 입력하기' 화면 내 안내 문구 기획서와 상이하게 노출 ",
+      "title": "[회원가입][기명회원전환][AOS] '직접 입력하기' 화면 내 안내 문구 기획서와 상이하게 노출 ",
       "area": "회원가입",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
@@ -3748,7 +3795,7 @@
     },
     {
       "id": "ISSUE-504",
-      "title": "[회원가입][기명회원 전환][AOS] '직접 입력하기' 화면 내 상세주소 입력 후 '단독 주택' 체크박스 (Check)>(Uncheck) 시 기입력 데이터 미초기화 결함 (iOS 미발생)",
+      "title": "[회원가입][기명회원전환][AOS] '직접 입력하기' 화면 내 상세주소 입력 후 '단독 주택' 체크박스 (Check)>(Uncheck) 시 기입력 데이터 미초기화 결함 (iOS 미발생)",
       "area": "회원가입",
       "defectType": "기능",
       "targetVersion": "5.20.0",
@@ -3761,7 +3808,7 @@
     },
     {
       "id": "ISSUE-503",
-      "title": "[회원가입][기명회원 전환][공통] '직접 입력하기' 화면 내 문구 기획서와 상이하게 노출",
+      "title": "[회원가입][기명회원전환][공통] '직접 입력하기' 화면 내 문구 기획서와 상이하게 노출",
       "area": "회원가입",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
@@ -3774,7 +3821,7 @@
     },
     {
       "id": "ISSUE-502",
-      "title": "[회원가입][기명회원 전환][AOS] '주소 등록' 화면 내 '직접 입력하기' 선택 시 '직접 입력(카카오)' 화면 오진입 결함 (iOS 미발생)",
+      "title": "[회원가입][기명회원전환][AOS] '주소 등록' 화면 내 '직접 입력하기' 선택 시 '직접 입력(카카오)' 화면 오진입 결함 (iOS 미발생)",
       "area": "회원가입",
       "defectType": "기능",
       "targetVersion": "5.20.0",
@@ -3787,7 +3834,7 @@
     },
     {
       "id": "ISSUE-501",
-      "title": "[회원가입][기명회원 전환][공통] ‘주소등록’ 화면 내 버튼 문구 기획서와 상이하게 노출",
+      "title": "[회원가입][기명회원전환][공통] ‘주소등록’ 화면 내 버튼 문구 기획서와 상이하게 노출",
       "area": "회원가입",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
@@ -3800,7 +3847,7 @@
     },
     {
       "id": "ISSUE-500",
-      "title": "[회원가입][기명회원 전환][AOS] '고객확인정보 등록' 화면 내 플레이스홀더(Placeholder) 문구 기획서와 불일치 (iOS 미발생)",
+      "title": "[회원가입][기명회원전환][AOS] '고객확인정보 등록' 화면 내 플레이스홀더(Placeholder) 문구 기획서와 불일치 (iOS 미발생)",
       "area": "회원가입",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
@@ -3813,13 +3860,13 @@
     },
     {
       "id": "ISSUE-499",
-      "title": "[회원가입][기명회원 전환][공통] '고객확인정보 등록' 화면 내 '거래 목적' 바텀 시트(BS) 노출 항목 기획서와 불일치 결함",
+      "title": "[회원가입][기명회원전환][공통] '고객확인정보 등록' 화면 내 '거래 목적' 바텀 시트(BS) 노출 항목 기획서와 불일치 결함",
       "area": "회원가입",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-02T06:50:00.000Z",
       "url": "https://www.notion.so/BS-33673fbd195180b09099c67d3c6466dc"
@@ -3839,7 +3886,7 @@
     },
     {
       "id": "ISSUE-497",
-      "title": "[회원가입][기명회원 전환][AOS] '고객확인정보 등록' 화면 내 하단 안내 문구 미노출 결함 (iOS 미발생)",
+      "title": "[회원가입][기명회원전환][AOS] '고객확인정보 등록' 화면 내 하단 안내 문구 미노출 결함 (iOS 미발생)",
       "area": "회원가입",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
@@ -3852,7 +3899,7 @@
     },
     {
       "id": "ISSUE-496",
-      "title": "[회원가입][기명회원 전환][AOS] 신분증 인증 ‘셀카 촬영’ 화면 상단 안내 문구 기획서와 상이하게 노출 (iOS정상)",
+      "title": "[회원가입][기명회원전환][AOS] 신분증 인증 ‘셀카 촬영’ 화면 상단 안내 문구 기획서와 상이하게 노출 (iOS정상)",
       "area": "회원가입",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
@@ -3865,20 +3912,20 @@
     },
     {
       "id": "ISSUE-495",
-      "title": "[공통][회원가입] 회원가입 완료 화면 내 안내 문구 기획서와 상이하게 노출",
-      "area": "공통",
+      "title": "[회원가입][공통] 회원가입 완료 화면 내 안내 문구 기획서와 상이하게 노출",
+      "area": "회원가입",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-02T06:26:00.000Z",
       "url": "https://www.notion.so/33673fbd195180c7a68fc94799823d0c"
     },
     {
       "id": "ISSUE-494",
-      "title": "[택시] [AOS] 이용내역 - 결제방법 결제통화 미노출 현상",
+      "title": "[택시][AOS] 이용내역 - 결제방법 결제통화 미노출 현상",
       "area": "택시",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
@@ -3904,7 +3951,7 @@
     },
     {
       "id": "ISSUE-492",
-      "title": "[택시] [iOS] 이용내역 - 결제완료 ‘원’ 표기가 KRW 로 노출되는 현상",
+      "title": "[택시][iOS] 이용내역 - 결제완료 ‘원’ 표기가 KRW 로 노출되는 현상",
       "area": "택시",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
@@ -3923,7 +3970,7 @@
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-02T04:40:00.000Z",
       "url": "https://www.notion.so/33673fbd19518004a6e8d92bb3770a0d"
@@ -3969,13 +4016,13 @@
     },
     {
       "id": "ISSUE-486",
-      "title": "[공통][회원가입] 개인정보 확인 상단 안내 문구 기획서와 상이하게 노출",
-      "area": "공통",
+      "title": "[회원가입][공통] 개인정보 확인 상단 안내 문구 기획서와 상이하게 노출",
+      "area": "회원가입",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-02T02:42:00.000Z",
       "url": "https://www.notion.so/33673fbd195180538d06f8475e92c0ea"
@@ -4001,20 +4048,20 @@
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-02T00:28:00.000Z",
       "url": "https://www.notion.so/AOS-Back-Button-iOS-33673fbd195180ed81eef4a95ac701b9"
     },
     {
       "id": "ISSUE-482",
-      "title": "[공통][회원가입] 비밀번호 미입력 시 '확인' 버튼 비정상 활성화 및 기획 미정의 '취소' 버튼 노출 ",
-      "area": "공통",
+      "title": "[회원가입][공통] 비밀번호 미입력 시 '확인' 버튼 비정상 활성화 및 기획 미정의 '취소' 버튼 노출 ",
+      "area": "회원가입",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-01T08:50:00.000Z",
       "url": "https://www.notion.so/33573fbd19518097b40cd2553b596f2f"
@@ -4086,8 +4133,8 @@
     },
     {
       "id": "ISSUE-476",
-      "title": "[공통][회원가입] 국적 '캄보디아' 선택 시 이메일 탭 비정상 노출 결함",
-      "area": "공통",
+      "title": "[회원가입][공통] 국적 '캄보디아' 선택 시 이메일 탭 비정상 노출 결함",
+      "area": "회원가입",
       "defectType": "기능",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4157,7 +4204,7 @@
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-01T05:59:00.000Z",
       "url": "https://www.notion.so/iOS-33573fbd1951809e8295dd7c631e37ae"
@@ -4170,7 +4217,7 @@
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-01T05:46:00.000Z",
       "url": "https://www.notion.so/AOS-iOS-33573fbd19518086b5dad435e5c923bd"
@@ -4203,8 +4250,8 @@
     },
     {
       "id": "ISSUE-465",
-      "title": "[공통][회원가입] 회원가입 페이지 문구 기획서와 상이",
-      "area": "공통",
+      "title": "[회원가입][공통] 회원가입 페이지 문구 기획서와 상이",
+      "area": "회원가입",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4222,7 +4269,7 @@
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "낮음",
       "createdAt": "2026-04-01T02:44:00.000Z",
       "url": "https://www.notion.so/UI-33573fbd19518045b7e3f2eb795b0c93"
@@ -4235,28 +4282,28 @@
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-04-01T01:36:00.000Z",
       "url": "https://www.notion.so/33573fbd195180af809fcf630a8eb9ec"
     },
     {
       "id": "ISSUE-462",
-      "title": "[통합 QR 결제][AOS] 생체인증 등록 사용자 진입 시 불필요한 화면 노출 후 생체인증 화면으로 이동되는 플로우 오류",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][AOS] 생체인증 등록 사용자 진입 시 불필요한 화면 노출 후 생체인증 화면으로 이동되는 플로우 오류",
+      "area": "통합QR결제",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Major",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-03-31T08:23:00.000Z",
       "url": "https://www.notion.so/QR-AOS-33473fbd195180e5962fe33d73190a55"
     },
     {
       "id": "ISSUE-461",
-      "title": "[통합 QR 결제][AOS] 생체인증 결제 시 에러코드(INVALID BIO AUTH / 40073) 노출",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][AOS] 생체인증 결제 시 에러코드(INVALID BIO AUTH / 40073) 노출",
+      "area": "통합QR결제",
       "defectType": "기능",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4281,8 +4328,8 @@
     },
     {
       "id": "ISSUE-459",
-      "title": "[통합 QR 결제][AOS][중국] 단일 결제수단임에도 상단 탭 및 ‘유니온페이 x 위챗페이 QR’ 메뉴명 노출 오류",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][AOS][중국] 단일 결제수단임에도 상단 탭 및 ‘유니온페이 x 위챗페이 QR’ 메뉴명 노출 오류",
+      "area": "통합QR결제",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4294,13 +4341,13 @@
     },
     {
       "id": "ISSUE-458",
-      "title": "[통합 QR 결제][AOS][캄보디아] 상단 탭 메뉴명 ‘유니온페이’ → ‘유니온페이 카드 QR’로 오표기",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][AOS][캄보디아] 상단 탭 메뉴명 ‘유니온페이’ → ‘유니온페이 카드 QR’로 오표기",
+      "area": "통합QR결제",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-03-31T07:46:00.000Z",
       "url": "https://www.notion.so/QR-AOS-QR-33473fbd1951808ca517c9b22cef9a4a"
@@ -4320,8 +4367,8 @@
     },
     {
       "id": "ISSUE-456",
-      "title": "[통합 QR 결제][AOS] 월렛 잔액 통화 단위 ‘원’으로 표기 오류 (KRW로 노출되어야 함, iOS 정상)",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][AOS] 월렛 잔액 통화 단위 ‘원’으로 표기 오류 (KRW로 노출되어야 함, iOS 정상)",
+      "area": "통합QR결제",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4333,8 +4380,8 @@
     },
     {
       "id": "ISSUE-455",
-      "title": "[통합 QR 결제][AOS][말레이시아] QR 스캔 안내 문구 기획서와 상이",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][AOS][말레이시아] QR 스캔 안내 문구 기획서와 상이",
+      "area": "통합QR결제",
       "defectType": "텍스트",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4359,8 +4406,8 @@
     },
     {
       "id": "ISSUE-451",
-      "title": "[통합 QR 결제][PPCB][캄보디아][AOS] 필수 약관 미동의 상태에서 다음 버튼 활성화 오류",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][PPCB][캄보디아][AOS] 필수 약관 미동의 상태에서 다음 버튼 활성화 오류",
+      "area": "통합QR결제",
       "defectType": "기능",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4372,34 +4419,34 @@
     },
     {
       "id": "ISSUE-449",
-      "title": "[통합 QR 결제][PPCB][캄보디아] 필수 ‘개인정보 국외 이전 동의’ 내용 미노출",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][PPCB][캄보디아] 필수 ‘개인정보 국외 이전 동의’ 내용 미노출",
+      "area": "통합QR결제",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-03-31T05:49:00.000Z",
       "url": "https://www.notion.so/QR-PPCB-33473fbd1951800f8605fda900d7ea83"
     },
     {
       "id": "ISSUE-448",
-      "title": "[통합 QR 결제][PPCB][캄보디아] 필수 ‘개인정보 제3자 제공 동의’ 약관 내용 미노출",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][PPCB][캄보디아] 필수 ‘개인정보 제3자 제공 동의’ 약관 내용 미노출",
+      "area": "통합QR결제",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-03-31T05:20:00.000Z",
       "url": "https://www.notion.so/QR-PPCB-3-33473fbd195180c08f2ad7bf5d1dc468"
     },
     {
       "id": "ISSUE-447",
-      "title": "[통합 QR 결제][iOS] 중국 선택 시 ‘유니온페이 x 위챗페이 QR’ 진입 불가 (서버 오류 → 무한 로딩 → PIN 화면 프리징)",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][iOS] 중국 선택 시 ‘유니온페이 x 위챗페이 QR’ 진입 불가 (서버 오류 → 무한 로딩 → PIN 화면 프리징)",
+      "area": "통합QR결제",
       "defectType": "기능",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4411,8 +4458,8 @@
     },
     {
       "id": "ISSUE-446",
-      "title": "[통합 QR 결제][AOS] 말레이시아 선택 시 유니온페이 카드 미보유자 화면에서 ‘유니온페이 카드 QR’ 제목 미노출",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][AOS] 말레이시아 선택 시 유니온페이 카드 미보유자 화면에서 ‘유니온페이 카드 QR’ 제목 미노출",
+      "area": "통합QR결제",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4424,8 +4471,8 @@
     },
     {
       "id": "ISSUE-445",
-      "title": "[통합 QR 결제][iOS] 말레이시아 선택 시 서버 오류 발생 후 무한 로딩 및 PIN 화면 프리징 발생",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][iOS] 말레이시아 선택 시 서버 오류 발생 후 무한 로딩 및 PIN 화면 프리징 발생",
+      "area": "통합QR결제",
       "defectType": "기능",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4437,8 +4484,8 @@
     },
     {
       "id": "ISSUE-444",
-      "title": "[통합 QR 결제][AOS] 상단 페이명 기획서와 상이하게 노출 (iOS 정상)",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][AOS] 상단 페이명 기획서와 상이하게 노출 (iOS 정상)",
+      "area": "통합QR결제",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4450,8 +4497,8 @@
     },
     {
       "id": "ISSUE-443",
-      "title": "[통합 QR 결제][iOS]로그인 후 통합 QR 결제 진입 시 Decode Error 팝업 발생",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][iOS]로그인 후 통합 QR 결제 진입 시 Decode Error 팝업 발생",
+      "area": "통합QR결제",
       "defectType": "기능",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4463,8 +4510,8 @@
     },
     {
       "id": "ISSUE-442",
-      "title": "[통합 QR 결제][AOS] 로그인 후 통합 QR 결제 진입 시 앱 크래시 발생",
-      "area": "통합 QR 결제",
+      "title": "[통합QR결제][AOS] 로그인 후 통합 QR 결제 진입 시 앱 크래시 발생",
+      "area": "통합QR결제",
       "defectType": "기능",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4476,8 +4523,8 @@
     },
     {
       "id": "ISSUE-441",
-      "title": "[통합 QR결제][iOS] 결제 수단 안내사항 내 ‘캄보디아 QR 결제’ 항목 미노출 (AOS 정상)",
-      "area": "통합 QR결제",
+      "title": "[통합QR결제][iOS] 결제 수단 안내사항 내 ‘캄보디아 QR 결제’ 항목 미노출 (AOS 정상)",
+      "area": "통합QR결제",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4489,8 +4536,8 @@
     },
     {
       "id": "ISSUE-440",
-      "title": "[iOS][제로페이][통합 QR 안내] 제로페이 관련 안내 문구 미노출",
-      "area": "iOS",
+      "title": "[제로페이][통합QR안내][iOS] 제로페이 관련 안내 문구 미노출",
+      "area": "제로페이",
       "defectType": "UX/UI",
       "targetVersion": "5.20.0",
       "domain": "한패스",
@@ -4498,7 +4545,7 @@
       "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-03-30T09:19:00.000Z",
-      "url": "https://www.notion.so/iOS-QR-33373fbd195180988d81c34834025b77"
+      "url": "https://www.notion.so/QR-iOS-33373fbd195180988d81c34834025b77"
     },
     {
       "id": "ISSUE-439",
@@ -4508,7 +4555,7 @@
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Critical",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-03-30T09:03:00.000Z",
       "url": "https://www.notion.so/CPM-TRX_SEQ-33373fbd195180e4a7cde03abae7b40f"
@@ -4586,7 +4633,7 @@
       "targetVersion": "5.20.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-03-30T04:58:00.000Z",
       "url": "https://www.notion.so/QR-33373fbd1951803c8c9bce3cbad9203a"
@@ -4619,8 +4666,8 @@
     },
     {
       "id": "ISSUE-427",
-      "title": "[해외송금 즐겨찾기][공통] 송금 대상자 등록 화면 국가 라벨 문구(AOS 영문 / iOS 한글) 불일치",
-      "area": "해외송금 즐겨찾기",
+      "title": "[해외송금][즐겨찾기][공통] 송금 대상자 등록 화면 국가 라벨 문구(AOS 영문 / iOS 한글) 불일치",
+      "area": "해외송금",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4632,8 +4679,8 @@
     },
     {
       "id": "ISSUE-426",
-      "title": "[해외송금 즐겨찾기][공통] 송금 대상자 등록 화면 뒤로가기 UI(AOS X / iOS <) 불일치",
-      "area": "해외송금 즐겨찾기",
+      "title": "[해외송금][즐겨찾기][공통] 송금 대상자 등록 화면 뒤로가기 UI(AOS X / iOS <) 불일치",
+      "area": "해외송금",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4645,8 +4692,8 @@
     },
     {
       "id": "ISSUE-425",
-      "title": "[해외송금 즐겨찾기][AOS] 송금 대상자 등록 화면에 의미 없는 회색 라인(구분선) 표출",
-      "area": "해외송금 즐겨찾기",
+      "title": "[해외송금][즐겨찾기][AOS] 송금 대상자 등록 화면에 의미 없는 회색 라인(구분선) 표출",
+      "area": "해외송금",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4658,8 +4705,8 @@
     },
     {
       "id": "ISSUE-424",
-      "title": "[온보딩 화면 수정 요청] 일본어 설정 - 생활 금융 서비스 소개 화면/업데이트 된 혜택화면  다국어 일부 미적용",
-      "area": "온보딩 화면 수정 요청",
+      "title": "[온보딩][화면수정요청] 일본어 설정 - 생활 금융 서비스 소개 화면/업데이트 된 혜택화면  다국어 일부 미적용",
+      "area": "온보딩",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4671,8 +4718,8 @@
     },
     {
       "id": "ISSUE-422",
-      "title": "[온보딩 화면 수정 요청] 파키스탄(Urdu) 설정 - ‘다음’ 선택 시 온보딩 화면이 업데이트 된 혜택 소개 페이지로 바로 이동하는 현상",
-      "area": "온보딩 화면 수정 요청",
+      "title": "[온보딩][화면수정요청] 파키스탄(Urdu) 설정 - ‘다음’ 선택 시 온보딩 화면이 업데이트 된 혜택 소개 페이지로 바로 이동하는 현상",
+      "area": "온보딩",
       "defectType": "기능",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4684,8 +4731,8 @@
     },
     {
       "id": "ISSUE-421",
-      "title": "[온보딩 화면 수정 요청] AOS 파키스탄(Urdu) 우측정렬 되어있지 않음",
-      "area": "온보딩 화면 수정 요청",
+      "title": "[온보딩][화면수정요청] AOS 파키스탄(Urdu) 우측정렬 되어있지 않음",
+      "area": "온보딩",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4697,8 +4744,8 @@
     },
     {
       "id": "ISSUE-420",
-      "title": "[온보딩 화면 수정 요청] AOS 파키스탄(Urdu) 설정 - ‘다음’ 버튼이 가운데 배치되어있음",
-      "area": "온보딩 화면 수정 요청",
+      "title": "[온보딩][화면수정요청] AOS 파키스탄(Urdu) 설정 - ‘다음’ 버튼이 가운데 배치되어있음",
+      "area": "온보딩",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4710,8 +4757,8 @@
     },
     {
       "id": "ISSUE-419",
-      "title": "[온보딩 화면 수정 요청] 캄보디아 언어 설정 시 ‘시작하기’가 영문으로 표출됨",
-      "area": "온보딩 화면 수정 요청",
+      "title": "[온보딩][화면수정요청] 캄보디아 언어 설정 시 ‘시작하기’가 영문으로 표출됨",
+      "area": "온보딩",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4723,8 +4770,8 @@
     },
     {
       "id": "ISSUE-418",
-      "title": "[온보딩 화면 수정 요청] 온보딩 화면 (송금서비스) 디자인 파일과 App 상이한 현상",
-      "area": "온보딩 화면 수정 요청",
+      "title": "[온보딩][화면수정요청] 온보딩 화면 (송금서비스) 디자인 파일과 App 상이한 현상",
+      "area": "온보딩",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4736,8 +4783,8 @@
     },
     {
       "id": "ISSUE-415",
-      "title": "[[APP] 자동계좌 등록 시, ARS 오류 개선 요청] iOS ARS 인증페이지 - 전화번호 입력이 아닌 선택으로 나오는 현상",
-      "area": "[APP",
+      "title": "[ARS인증][자동계좌 등록 시, ARS 오류 개선 요청]iOS ARS 인증페이지 - 전화번호 입력이 아닌 선택으로 나오는 현상",
+      "area": "ARS인증",
       "defectType": "기능",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4745,12 +4792,12 @@
       "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-02-23T09:22:00.000Z",
-      "url": "https://www.notion.so/APP-ARS-iOS-ARS-31073fbd1951807c86baf718dbaf2706"
+      "url": "https://www.notion.so/ARS-ARS-iOS-ARS-31073fbd1951807c86baf718dbaf2706"
     },
     {
       "id": "ISSUE-414",
-      "title": "[[APP] 자동계좌 등록 시, ARS 오류 개선 요청] ARS 인증 페이지 아이콘 디자인과 ‘ARS 인증 완료’ 버튼 문구가 기획서와 상이함",
-      "area": "[APP",
+      "title": "[ARS인증][자동계좌 등록 시, ARS 오류 개선 요청] 아이콘 디자인, ‘ARS 인증 완료’ 버튼 문구 기획서와 상이",
+      "area": "ARS인증",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4758,7 +4805,7 @@
       "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-02-23T08:29:00.000Z",
-      "url": "https://www.notion.so/APP-ARS-ARS-ARS-31073fbd19518048af20de96ab41fca4"
+      "url": "https://www.notion.so/ARS-ARS-ARS-31073fbd19518048af20de96ab41fca4"
     },
     {
       "id": "ISSUE-413",
@@ -4768,7 +4815,7 @@
       "targetVersion": "5.19.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-02-23T08:15:00.000Z",
       "url": "https://www.notion.so/10-31073fbd1951807baa48fb57986711bc"
@@ -4781,15 +4828,15 @@
       "targetVersion": "5.19.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-02-23T07:51:00.000Z",
       "url": "https://www.notion.so/A-Z-31073fbd1951801181f5c943fda5cde3"
     },
     {
       "id": "ISSUE-411",
-      "title": "[[APP] 자동계좌 등록 시, ARS 오류 개선 요청] 국가번호 바텀시트 순서가 기획서와 상이함",
-      "area": "[APP",
+      "title": "[ARS인증] 자동계좌 등록 시, ARS 오류 개선 요청 -국가번호 바텀시트 순서가 기획서와 상이함",
+      "area": "ARS인증",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -4797,7 +4844,7 @@
       "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-02-23T07:50:00.000Z",
-      "url": "https://www.notion.so/APP-ARS-31073fbd195180deab77e1dbaff464b7"
+      "url": "https://www.notion.so/ARS-ARS-31073fbd195180deab77e1dbaff464b7"
     },
     {
       "id": "ISSUE-410",
@@ -4846,7 +4893,7 @@
       "targetVersion": "5.19.0",
       "domain": "한패스",
       "severity": "Major",
-      "status": "결함 아님 (Not an issue)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-02-23T04:36:00.000Z",
       "url": "https://www.notion.so/31073fbd195180dda10fc87f4b031b6b"
@@ -5009,8 +5056,8 @@
     },
     {
       "id": "ISSUE-338",
-      "title": "[QR 송금/결제][iOS] 송금 금액 입력 후 전체 삭제 시, 서비스 수수료 쿠폰 안내 노티가 비정상적으로 표출됨",
-      "area": "QR 송금/결제",
+      "title": "[해외송금][iOS] 송금 금액 입력 후 전체 삭제 시, 서비스 수수료 쿠폰 안내 노티가 비정상적으로 표출됨",
+      "area": "해외송금",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -5018,7 +5065,7 @@
       "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-01-29T05:12:00.000Z",
-      "url": "https://www.notion.so/QR-iOS-2f773fbd1951804b860fcbe69bd83838"
+      "url": "https://www.notion.so/iOS-2f773fbd1951804b860fcbe69bd83838"
     },
     {
       "id": "ISSUE-337",
@@ -5204,8 +5251,8 @@
     },
     {
       "id": "ISSUE-322",
-      "title": "[QR 송금/결제 - 캄보디아 PPCB][공통] 받는 방법 선택 팝업 옵션 순서 불일치",
-      "area": "QR 송금/결제 - 캄보디아 PPCB",
+      "title": "[해외송금][캄보디아][PPCB][공통] 받는 방법 선택 팝업 옵션 순서 불일치",
+      "area": "해외송금",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
@@ -5213,7 +5260,7 @@
       "status": "추후 수정 백로그 이관",
       "priority": "보통",
       "createdAt": "2026-01-28T07:44:00.000Z",
-      "url": "https://www.notion.so/QR-PPCB-2f673fbd195180cf9494e567a3866ab8"
+      "url": "https://www.notion.so/PPCB-2f673fbd195180cf9494e567a3866ab8"
     },
     {
       "id": "ISSUE-321",
@@ -5301,7 +5348,7 @@
       "targetVersion": "5.19.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "추후 수정 백로그 이관",
       "priority": "보통",
       "createdAt": "2026-01-27T05:32:00.000Z",
       "url": "https://www.notion.so/2f573fbd19518068a0e6e4db163cd723"
@@ -5321,26 +5368,26 @@
     },
     {
       "id": "ISSUE-307",
-      "title": "[한마켓 내 SHOP 버튼 기능 오류개선] 언어(영어) 자주 구매하는 상품 저장 시도 시 한글로 나오는 현상",
-      "area": "한마켓 내 SHOP 버튼 기능 오류개선",
+      "title": "[한마켓]SHOP 버튼 기능 오류개선-언어(영어) 자주 구매하는 상품 저장 시도 시 한글로 나오는 현상",
+      "area": "한마켓",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "추후 수정 백로그 이관",
       "priority": "보통",
       "createdAt": "2026-01-27T01:20:00.000Z",
       "url": "https://www.notion.so/SHOP-2f573fbd1951801ea76cf879efa013d7"
     },
     {
       "id": "ISSUE-306",
-      "title": "[[커머스] 고객센터 CS버튼 제거 요청] AOS 상품 원본보기 되지 않는 현상",
-      "area": "[커머스",
+      "title": "[한마켓] 고객센터 CS버튼 제거 요청 AOS 상품 원본보기 되지 않는 현상",
+      "area": "한마켓",
       "defectType": "UX/UI",
       "targetVersion": "5.19.0",
       "domain": "한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "추후 수정 백로그 이관",
       "priority": "보통",
       "createdAt": "2026-01-26T08:38:00.000Z",
       "url": "https://www.notion.so/CS-AOS-2f473fbd1951802792b5e95f610d99be"
@@ -5400,8 +5447,8 @@
   ],
   "summary": {
     "total": 351,
-    "open": 94,
-    "futureFix": 12,
+    "open": 90,
+    "futureFix": 15,
     "majorPlus": 92,
     "critical": 20,
     "domains": {
@@ -5682,6 +5729,14 @@
       return String(a).localeCompare(String(b), "ko");
     }
 
+    function visibleVersionWindow(items, currentVersion, size = 5) {
+      if (!items.length) return [];
+      const index = Math.max(0, items.findIndex(item => item.version === currentVersion));
+      const endIndex = index >= 0 ? index : items.length - 1;
+      const startIndex = Math.max(0, endIndex - (size - 1));
+      return items.slice(startIndex, endIndex + 1);
+    }
+
     function countBy(rows, key) {
       return rows.reduce((acc, row) => {
         const value = row[key] || "미지정";
@@ -5727,6 +5782,7 @@
 
     function renderVersionChart(rows) {
       const chart = document.getElementById("versionChart");
+      const select = document.getElementById("versionSelect");
       const versionMap = new Map();
       rows.forEach(row => {
         const version = row.targetVersion || "미지정";
@@ -5743,6 +5799,10 @@
       const items = Array.from(versionMap.values()).sort((a, b) => compareVersions(a.version, b.version));
       if (!items.length) {
         chart.innerHTML = '<div class="empty">표시할 버전 데이터가 없습니다.</div>';
+        if (select) {
+          select.innerHTML = "";
+          select.disabled = true;
+        }
         return;
       }
 
@@ -5750,6 +5810,8 @@
         selectedVersion = items[items.length - 1].version;
       }
       const selected = versionMap.get(selectedVersion);
+      const visibleItems = visibleVersionWindow(items, selectedVersion, 5);
+      const visibleVersions = new Set(visibleItems.map(item => item.version));
 
       const width = 1120;
       const height = 380;
@@ -5757,24 +5819,30 @@
       const padY = 46;
       const plotW = width - padX * 2;
       const plotH = height - padY * 2;
-      const max = Math.max(...items.map(item => item.total), 1);
-      const step = items.length > 1 ? plotW / (items.length - 1) : plotW;
-      const points = items.map((item, index) => {
-        const x = padX + (items.length > 1 ? index * step : plotW / 2);
+      const max = Math.max(...visibleItems.map(item => item.total), 1);
+      const step = visibleItems.length > 1 ? plotW / (visibleItems.length - 1) : plotW;
+      const points = visibleItems.map((item, index) => {
+        const x = padX + (visibleItems.length > 1 ? index * step : plotW / 2);
         const y = padY + plotH - (item.total / max) * plotH;
         return { ...item, x, y };
       });
       const path = points.map(point => `${point.x},${point.y}`).join(" ");
 
-      document.getElementById("chartMeta").textContent = `선택 ${selectedVersion} / ${selected.total}건`;
+      if (select) {
+        select.disabled = false;
+        select.innerHTML = items.map(item => `
+          <option value="${item.version}" ${item.version === selectedVersion ? "selected" : ""}>
+            ${item.version} · ${item.total}건
+          </option>
+        `).join("");
+        select.onchange = () => {
+          selectedVersion = select.value;
+          renderVersionChart(rows);
+        };
+      }
+
+      document.getElementById("chartMeta").textContent = `최근 ${visibleItems.length}개 / 선택 ${selectedVersion} / ${selected.total}건`;
       chart.innerHTML = `
-        <div class="version-buttons">
-          ${items.map(item => `
-            <button class="version-tab ${item.version === selectedVersion ? "active" : ""}" type="button" data-version="${item.version}">
-              ${item.version} · ${item.total}
-            </button>
-          `).join("")}
-        </div>
         <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="타겟 버전별 결함 추이 그래프">
           <line x1="${padX}" y1="${height - padY}" x2="${width - padX}" y2="${height - padY}" stroke="currentColor" opacity=".18" />
           ${points.map(point => `
@@ -5792,13 +5860,6 @@
           ${renderDistributionBlock("결함유형 분포", countBy(selected.rows, "defectType"), selected.total, "type")}
         </div>
       `;
-
-      chart.querySelectorAll(".version-tab").forEach(button => {
-        button.addEventListener("click", () => {
-          selectedVersion = button.dataset.version;
-          renderVersionChart(rows);
-        });
-      });
     }
 
     function normalizeRect(rect) {
