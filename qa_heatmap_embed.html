@@ -62,7 +62,7 @@
     }
     body {
       width: 100%;
-      min-height: 1800px;
+      min-height: 100vh;
       overflow-x: hidden;
     }
     body {
@@ -96,7 +96,7 @@
       justify-content: space-between;
       gap: 16px;
       align-items: flex-end;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     .title { font-size: 18px; font-weight: 800; }
     .subtitle { margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.35; }
@@ -104,19 +104,19 @@
     .summary {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 8px;
     }
     .growth {
       display: grid;
-      grid-template-columns: 220px 1fr;
-      gap: 10px;
+      grid-template-columns: 190px 1fr;
+      gap: 8px;
       align-items: stretch;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       background: var(--surface-panel);
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 10px 12px;
+      padding: 8px 10px;
     }
     .growth-title {
       color: var(--muted);
@@ -127,18 +127,18 @@
       display: block;
       margin-top: 4px;
       color: var(--text);
-      font-size: 18px;
+      font-size: 16px;
       line-height: 1.1;
     }
     .funnel {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 6px;
+      gap: 5px;
     }
     .funnel-step {
       min-width: 0;
       border-radius: 7px;
-      padding: 8px 9px;
+      padding: 7px 8px;
       background: rgba(255, 255, 255, .48);
       border: 1px solid var(--line);
     }
@@ -152,7 +152,7 @@
     .funnel-value {
       margin-top: 4px;
       color: var(--text);
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 800;
     }
     .funnel-bar {
@@ -175,7 +175,7 @@
       background: var(--surface-panel);
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 12px 14px;
+      padding: 10px 12px;
       min-width: 0;
       position: relative;
       overflow: hidden;
@@ -196,12 +196,12 @@
     .card.risk { --accent: #16a34a; background: var(--surface-risk-low); }
     .card.risk.medium { --accent: #d97706; background: var(--surface-risk-medium); }
     .card.risk.high { --accent: #dc2626; background: var(--surface-risk-high); }
-    .card-label { color: var(--muted); font-size: 12px; margin-bottom: 6px; padding-left: 2px; }
-    .card-value { color: var(--accent, var(--text)); font-size: 24px; font-weight: 800; line-height: 1.05; }
+    .card-label { color: var(--muted); font-size: 11px; margin-bottom: 5px; padding-left: 2px; }
+    .card-value { color: var(--accent, var(--text)); font-size: 20px; font-weight: 800; line-height: 1.05; }
     .card-note {
-      margin-top: 5px;
+      margin-top: 4px;
       color: var(--muted-2);
-      font-size: 11px;
+      font-size: 10px;
       line-height: 1.3;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -219,7 +219,7 @@
       min-height: 0;
     }
     .panel-title {
-      padding: 9px 12px;
+      padding: 8px 10px;
       color: var(--text);
       font-size: 12px;
       font-weight: 700;
@@ -236,7 +236,7 @@
     }
     .panel-body {
       border-top: 1px solid var(--line);
-      padding: 10px;
+      padding: 8px;
       display: flex;
       flex-direction: column;
       min-height: 0;
@@ -249,7 +249,7 @@
       min-height: 0;
       flex: 1 1 auto;
       overflow-x: hidden;
-      overflow-y: auto;
+      overflow-y: hidden;
       overscroll-behavior: contain;
       padding-right: 4px;
     }
@@ -259,7 +259,7 @@
       align-items: center;
       flex-direction: row;
       gap: 8px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .tabs { display: flex; flex-wrap: wrap; gap: 7px; }
     .tab {
@@ -314,9 +314,10 @@
     .detail-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 10px;
-      align-items: start;
-      min-height: 1240px;
+      gap: 8px;
+      align-items: stretch;
+      min-height: 0;
+      flex: 1 1 auto;
     }
     .detail-scroll::-webkit-scrollbar {
       width: 10px;
@@ -336,15 +337,17 @@
       min-height: 0;
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 10px;
+      padding: 8px;
       background: rgba(255, 255, 255, .34);
+      display: flex;
+      flex-direction: column;
     }
     .detail-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       color: var(--muted);
       font-size: 11px;
     }
@@ -357,14 +360,18 @@
       border-radius: 8px;
       overflow: hidden;
       background: rgba(255, 255, 255, .18);
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
     }
     .heatmap-topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      min-height: 42px;
-      padding: 8px 10px;
+      min-height: 34px;
+      padding: 6px 8px;
       border-bottom: 1px solid var(--line);
       background: rgba(255, 255, 255, .36);
     }
@@ -378,8 +385,8 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      min-height: 28px;
-      padding: 5px 8px;
+      min-height: 26px;
+      padding: 4px 7px;
       border: 1px solid var(--tab-line);
       border-radius: 6px;
       background: var(--tab-bg);
@@ -411,17 +418,18 @@
     }
     .heatmap {
       position: relative;
-      height: 560px;
-      min-height: 420px;
+      height: 360px;
+      min-height: 0;
       overflow: hidden;
       border-radius: 0;
       background: rgba(120, 113, 108, .08);
+      flex: 1 1 auto;
     }
     .heatmap-scale {
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 8px 10px;
+      padding: 6px 8px;
       border-top: 1px solid var(--line);
       color: var(--muted);
       font-size: 10px;
@@ -440,7 +448,10 @@
     .scale-bar span:nth-child(4) { background: #ef4444; }
     .scale-bar span:nth-child(5) { background: #7f1d1d; }
     .chart {
-      min-height: 480px;
+      min-height: 0;
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
     }
     .chart-head {
       display: flex;
@@ -462,7 +473,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      min-width: 220px;
+      min-width: 210px;
       justify-content: flex-end;
       flex-wrap: wrap;
     }
@@ -476,7 +487,7 @@
       min-width: 160px;
       max-width: 260px;
       width: 100%;
-      height: 30px;
+      height: 28px;
       border: 1px solid var(--tab-line);
       border-radius: 7px;
       background: var(--tab-bg);
@@ -512,9 +523,9 @@
       border-color: transparent;
     }
     .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
-    .axis-label { fill: currentColor; color: var(--muted); font-size: 15px; font-weight: 700; }
-    .chart-count { fill: currentColor; color: var(--text); font-size: 15px; font-weight: 800; }
-    .trend-line { fill: none; stroke: #2563eb; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+    .axis-label { fill: currentColor; color: var(--muted); font-size: 13px; font-weight: 700; }
+    .chart-count { fill: currentColor; color: var(--text); font-size: 13px; font-weight: 800; }
+    .trend-line { fill: none; stroke: #2563eb; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
     .trend-dot { fill: #dc2626; stroke: rgba(255, 255, 255, .7); stroke-width: 2; }
     .trend-dot.selected { fill: #fbbf24; stroke: #dc2626; stroke-width: 3; }
     .trend-bar { fill: rgba(37, 99, 235, .22); }
@@ -522,20 +533,20 @@
     .distribution {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 10px;
-      margin-top: 12px;
+      gap: 8px;
+      margin-top: 8px;
     }
     .dist-block {
       min-width: 0;
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 10px;
+      padding: 8px;
       background: rgba(255, 255, 255, .28);
     }
     .dist-title {
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       color: var(--text);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
     }
     .dist-row {
@@ -543,11 +554,11 @@
       grid-template-columns: minmax(0, 1fr) 54px 48px;
       gap: 8px;
       align-items: center;
-      margin-top: 6px;
+      margin-top: 5px;
       color: var(--muted);
-      font-size: 12px;
+      font-size: 11px;
       border-radius: 6px;
-      padding: 5px 6px;
+      padding: 4px 6px;
     }
     .dist-name {
       overflow: hidden;
@@ -646,9 +657,9 @@
       justify-content: space-between;
       flex-direction: column;
       gap: 4px;
-      margin-top: 9px;
+      margin-top: 6px;
       color: var(--muted);
-      font-size: 10px;
+      font-size: 9px;
     }
     .empty {
       padding: 48px 12px;
@@ -879,8 +890,21 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-05-18 15:05:56",
+  "generatedAt": "2026-05-18 16:36:00",
   "rows": [
+    {
+      "id": "ISSUE-818",
+      "title": "[게이미피케이션][AOS] 앱 흔들기 완료 후 ‘40001 에러’ 팝업 노출 되는 현상",
+      "area": "게이미피케이션",
+      "defectType": "기능",
+      "targetVersion": "5.21.0",
+      "domain": "한패스",
+      "severity": "Major",
+      "status": "등록 (Registered)",
+      "priority": "보통",
+      "createdAt": "2026-05-18T07:27:00.000Z",
+      "url": "https://www.notion.so/AOS-40001-36473fbd195180d6aae4c33f12f97ccd"
+    },
     {
       "id": "ISSUE-814",
       "title": "[관광객카드] 결제 방식 선택 BS 내 ‘나중에 결제’ 안내 문구 기획서와 상이",
@@ -928,7 +952,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "처리중 (In Progress)",
       "priority": "보통",
       "createdAt": "2026-05-15T07:34:00.000Z",
       "url": "https://www.notion.so/AOS-36173fbd195180e5849dfdcf69138f16"
@@ -993,7 +1017,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "등록 (Registered)",
+      "status": "처리중 (In Progress)",
       "priority": "보통",
       "createdAt": "2026-05-15T01:50:00.000Z",
       "url": "https://www.notion.so/36173fbd195180ca844cc355c4627d00"
@@ -1214,7 +1238,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "배정 (Assigned)",
+      "status": "개발 완료 (Dev Done)",
       "priority": "보통",
       "createdAt": "2026-05-14T04:15:00.000Z",
       "url": "https://www.notion.so/36073fbd19518085ba96e257e698ba03"
@@ -1604,7 +1628,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Critical",
-      "status": "등록 (Registered)",
+      "status": "처리중 (In Progress)",
       "priority": "보통",
       "createdAt": "2026-05-12T06:40:00.000Z",
       "url": "https://www.notion.so/5-35e73fbd195180af9da8c57c953aed86"
@@ -1695,7 +1719,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "등록 (Registered)",
+      "status": "개발 완료 (Dev Done)",
       "priority": "보통",
       "createdAt": "2026-05-12T05:56:00.000Z",
       "url": "https://www.notion.so/AOS-35e73fbd195180029017ea7f1ebd4dc5"
@@ -1721,7 +1745,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "등록 (Registered)",
+      "status": "결함 아님 (Not an issue)",
       "priority": "보통",
       "createdAt": "2026-05-12T05:04:00.000Z",
       "url": "https://www.notion.so/35e73fbd1951805fa071de38e045d0d9"
@@ -1942,7 +1966,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "등록 (Registered)",
+      "status": "처리중 (In Progress)",
       "priority": "보통",
       "createdAt": "2026-05-12T04:14:00.000Z",
       "url": "https://www.notion.so/35e73fbd19518014aeddca438a910ef1"
@@ -1968,7 +1992,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "처리중 (In Progress)",
+      "status": "개발 완료 (Dev Done)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:56:00.000Z",
       "url": "https://www.notion.so/Web-AOS-35e73fbd195180e3ab4aec904311ccdd"
@@ -2046,7 +2070,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Major",
-      "status": "배정 (Assigned)",
+      "status": "결함 아님 (Not an issue)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:28:00.000Z",
       "url": "https://www.notion.so/35e73fbd195180b0a619f9e9a6cbbd28"
@@ -2085,7 +2109,7 @@
       "targetVersion": "[G.H]v1.0.0",
       "domain": "방한 고한패스",
       "severity": "Minor",
-      "status": "처리중 (In Progress)",
+      "status": "개발 완료 (Dev Done)",
       "priority": "보통",
       "createdAt": "2026-05-12T02:22:00.000Z",
       "url": "https://www.notion.so/20-pin-35e73fbd1951807f9632d12b3341c4b5"
@@ -2241,7 +2265,7 @@
       "targetVersion": "5.21.0",
       "domain": "한패스",
       "severity": "Major",
-      "status": "개발 완료 (Dev Done)",
+      "status": "QA 검증 -회귀 (QA Verification)",
       "priority": "보통",
       "createdAt": "2026-05-11T05:35:00.000Z",
       "url": "https://www.notion.so/iOS-CTA-Flow-35d73fbd195180229fa1f0d5b2bebbe7"
@@ -2280,7 +2304,7 @@
       "targetVersion": "5.21.0",
       "domain": "한패스",
       "severity": "개선 의견",
-      "status": "개발 완료 (Dev Done)",
+      "status": "QA 검증 -회귀 (QA Verification)",
       "priority": "보통",
       "createdAt": "2026-05-08T09:12:00.000Z",
       "url": "https://www.notion.so/35a73fbd195180ffa65df2dc6d99bd5e"
@@ -2475,7 +2499,7 @@
       "targetVersion": "5.21.0",
       "domain": "한패스",
       "severity": "Major",
-      "status": "개발 완료 (Dev Done)",
+      "status": "결함 재발생 (Reopen)",
       "priority": "보통",
       "createdAt": "2026-05-08T05:36:00.000Z",
       "url": "https://www.notion.so/Reward_029-35a73fbd195180acb528df698bc3cd14"
@@ -5446,14 +5470,14 @@
     }
   ],
   "summary": {
-    "total": 351,
-    "open": 87,
+    "total": 352,
+    "open": 83,
     "futureFix": 15,
-    "majorPlus": 92,
+    "majorPlus": 93,
     "critical": 20,
     "domains": {
-      "방한 고한패스": 101,
-      "한패스": 250
+      "한패스": 251,
+      "방한 고한패스": 101
     }
   }
 };
@@ -5814,9 +5838,9 @@
       const visibleVersions = new Set(visibleItems.map(item => item.version));
 
       const width = 1120;
-      const height = 380;
-      const padX = 62;
-      const padY = 46;
+      const height = 290;
+      const padX = 54;
+      const padY = 38;
       const plotW = width - padX * 2;
       const plotH = height - padY * 2;
       const max = Math.max(...visibleItems.map(item => item.total), 1);
