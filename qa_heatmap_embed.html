@@ -890,7 +890,7 @@
 
   <script>
     const DATA = {
-  "generatedAt": "2026-06-05 08:52:29",
+  "generatedAt": "2026-06-05T00:52:31+00:00",
   "rows": [
     {
       "id": "ISSUE-874",
@@ -1014,7 +1014,7 @@
       "title": "[게이미피케이션][만보기][AOS] 권한 허용 후 앱 흔들기 진입 시 ‘동작 및 피트니스 권한’ 팝업 노출 ",
       "area": "게이미피케이션",
       "defectType": "접근성",
-      "targetVersion": "5.21.0",
+      "targetVersion": "5.22.1",
       "domain": "한패스",
       "severity": "Major",
       "status": "등록 (Registered)",
@@ -1030,7 +1030,7 @@
       "targetVersion": "5.22.0",
       "domain": "한패스",
       "severity": "Major",
-      "status": "QA 검증 -회귀 (QA Verification)",
+      "status": "완료 (Done)",
       "priority": "보통",
       "createdAt": "2026-05-28T09:23:00.000Z",
       "url": "https://app.notion.com/p/iOS-36e73fbd19518068a6e2f96c083258b3"
@@ -1193,10 +1193,10 @@
     },
     {
       "id": "ISSUE-835",
-      "title": "[QR결제] 무기명 계정 상태에서 통합 QR 결제 진입 시 ‘자동출금계좌 등록’ 유도 팝업 미노출 현상\n",
+      "title": "[QR결제] 무기명 계정 상태에서 통합 QR 결제 진입 시 ‘자동출금계좌 등록’ 유도 팝업 미노출 현상",
       "area": "QR결제",
       "defectType": "기능",
-      "targetVersion": "5.21.0",
+      "targetVersion": "5.23.0",
       "domain": "한패스",
       "severity": "Major",
       "status": "등록 (Registered)",
@@ -2977,7 +2977,7 @@
       "title": "[QR결제] 결제 실패 페이지 실패 사유 기획서와 상이함",
       "area": "QR결제",
       "defectType": "UX/UI",
-      "targetVersion": "5.21.0",
+      "targetVersion": "5.22.0",
       "domain": "한패스",
       "severity": "Minor",
       "status": "추척 관찰-백로그",
@@ -6436,7 +6436,35 @@
         openIssueList("미완료 결함 리스트", filtered.filter(row => !isDone(row) && !isFutureFix(row)), "Done/QA검증/결함아님/추후수정 제외");
       document.querySelector(".card.future").onclick = () =>
         openIssueList("추후 수정 결함 리스트", filtered.filter(isFutureFix), "추후 수정 백로그 이관");
-      document.getElementById("updatedAt").textContent = DATA.generatedAt;
+      const normalizeDateInput = (value) => {
+        const text = String(value ?? "").trim();
+        if (!text) return "";
+        if (/[zZ]$|[+-]\d{2}:\d{2}$/.test(text)) return text;
+        if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?$/.test(text)) {
+          return `${text.replace(" ", "T")}+09:00`;
+        }
+        return text;
+      };
+
+      const formatKstDateTime = (value) => {
+        if (!value) return "-";
+        const date = new Date(normalizeDateInput(value));
+        if (Number.isNaN(date.getTime())) return String(value).replace("T", " ");
+        const parts = new Intl.DateTimeFormat("sv-SE", {
+          timeZone: "Asia/Seoul",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+        }).formatToParts(date);
+        const lookup = Object.fromEntries(parts.filter((part) => part.type !== "literal").map((part) => [part.type, part.value]));
+        return `${lookup.year}-${lookup.month}-${lookup.day} ${lookup.hour}:${lookup.minute}:${lookup.second}`;
+      };
+
+      document.getElementById("updatedAt").textContent = formatKstDateTime(DATA.generatedAt);
     }
 
     render();
